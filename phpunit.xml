@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit backupGlobals="false"
+         backupStaticAttributes="false"
+         bootstrap="phpunit.php"
+         colors="true"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         processIsolation="false"
+         stopOnFailure="false"
+         syntaxCheck="false"
+>
+    <testsuites>
+        <testsuite name="command">
+            <directory>Tests/Command</directory>
+        </testsuite>
+        <testsuite name="mapper">
+            <directory>Tests/Mapper</directory>
+        </testsuite>
+        <testsuite name="generator">
+            <directory>Tests/Generator</directory>
+        </testsuite>
+        <testsuite name="helper">
+            <directory>Tests/Helper</directory>
+        </testsuite>
+        <testsuite name="map">
+            <directory>Tests/Map</directory>
+        </testsuite>
+        <testsuite name="package">
+            <directory>Tests/Package/Foote/Generator</directory>
+            <directory>Tests/Package/Foote/Mapper</directory>
+        </testsuite>
+        <testsuite name="twig">
+            <directory>Tests/Twig</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>

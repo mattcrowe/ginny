@@ -1,0 +1,32 @@
+{
+    "name": "crowefoote/ginny",
+    "type": "development",
+    "description": "MVC Code Generator",
+    "keywords": [],
+    "homepage": "http://raventech.us",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Matt Crowe",
+            "email": "raventech@zym.me"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3",
+        "symfony/console": "2.5.*@dev",
+        "symfony/yaml": "2.6.*@dev",
+        "symfony/filesystem": "2.6.*@dev",
+        "symfony/http-foundation": "2.5.*@dev",
+        "twig/extensions": "~1.0",
+        "icanboogie/inflector": "*"
+    },
+    "require-dev": {
+    },
+    "suggest": {
+        "raveren/kint": "dev-master"
+    },
+    "autoload": {
+        "psr-0": { "Foote\\Ginny": "" }
+    },
+    "target-dir": "Foote/Ginny"
+}

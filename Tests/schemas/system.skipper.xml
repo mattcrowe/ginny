@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<skipper version="" name="Ginny" mvc="Symfony2" orm="" >
+  <module name="System" >
+    <entity name="User" >
+      <field name="id" type="integer" required="true" unique="true" primary="true" auto-increment="true" />
+      <field name="client_id" type="integer" required="true" />
+      <field name="active" type="integer" size="1" default="1" />
+      <field name="email" type="string" size="100" required="true" />
+      <orm-attributes>
+        <attribute name="table">users</attribute>
+      </orm-attributes>
+    </entity>
+    <association from="User" to="Client" caption="Group User" owner-alias="user" inverse-alias="client" >
+      <association-field from="client_id" to="id"/>
+    </association>
+    <entity name="Profile" >
+      <field name="id" type="integer" required="true" unique="true" primary="true" auto-increment="true" />
+      <field name="user_id" type="integer" required="true" unique="true" />
+      <field name="outside_id" type="integer" required="true" />
+      <field name="description" type="string" size="255" />
+    </entity>
+    <association from="Profile" to="User" caption="User Profile" owner-alias="profile" inverse-alias="user" >
+      <association-field from="user_id" to="id"/>
+    </association>
+    <entity name="Role" >
+      <field name="id" type="integer" required="true" unique="true" primary="true" auto-increment="true" />
+      <field name="name" type="string" size="25" required="true" />
+      <field name="description" type="string" size="255" />
+    </entity>
+    <entity name="Client" >
+      <field name="id" type="integer" required="true" unique="true" primary="true" auto-increment="true" />
+      <field name="name" type="string" size="255" required="true" />
+      <field name="username" type="string" size="255" required="true" />
+    </entity>
+    <entity name="UserRole" >
+      <field name="id" type="integer" size="11" required="true" primary="true" auto-increment="true" />
+      <field name="user_id" type="integer" size="11" required="true" primary="true" />
+      <field name="role_id" type="integer" size="11" required="true" primary="true" />
+    </entity>
+
+    <many-to-many mn-entity="UserRole" caption="User to Role" >
+      <many-to-many-entity name="Role" owning-side="true" alias="role" >
+        <many-to-many-field from="role_id" to="id"/>
+      </many-to-many-entity>
+      <many-to-many-entity name="User" owning-side="false" alias="user" >
+        <many-to-many-field from="user_id" to="id"/>
+      </many-to-many-entity>
+    </many-to-many>
+  </module>
+</skipper>

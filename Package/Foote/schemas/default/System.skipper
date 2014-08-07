@@ -1,0 +1,108 @@
+<?xml version="1.0"?>
+<skipper version="3.0.0.1099" name="Ginny" mvc="Symfony2" orm="Doctrine2" uuid="b1a41763-5ce8-4dee-938a-ddfa6aee9fcb">
+  <module name="System" uuid="e90dd201-08a8-45df-bef2-736fcb3d0961">
+    <entity name="User" uuid="f3ac07db-4585-4f65-ad3d-0b6dc65aeaba">
+      <field name="id" type="integer" required="true" unique="true" primary="true" auto-increment="true" uuid="d0961300-c780-4880-be87-1105f8ce296f"/>
+      <field name="client_id" type="integer" required="true" uuid="e344441a-d6dc-4c0d-bc38-2deb5b3e51f4"/>
+      <field name="active" type="integer" size="1" default="1" uuid="f3394980-5180-4b7a-ae50-940f218954d0"/>
+      <field name="first_name" type="string" size="50" required="true" uuid="52f21dad-08b7-41f1-8e39-f911615c65aa"/>
+      <field name="mi" type="string" size="1" uuid="fc762497-3bde-426f-8ff4-3cc52d4c5925"/>
+      <field name="last_name" type="string" size="50" required="true" uuid="49542fe0-f8fe-4c1a-9d90-4ba7a2036ae3"/>
+      <field name="username" type="string" size="25" required="true" uuid="a7e3e5cb-a6f7-4b94-8dc3-2aa0394fe0a7"/>
+      <field name="email" type="string" size="100" required="true" uuid="8b4fe008-5f8c-49c9-9e7e-424c0ddea8c9"/>
+      <field name="salt" type="string" size="50" required="true" uuid="d7e0fd79-de82-4c66-86c5-6f93fbe770fb"/>
+      <field name="password" type="string" size="50" required="true" uuid="5c93ce96-6758-46db-a985-e21649a22696"/>
+      <field name="params" type="text" uuid="65c472fa-8f9b-4118-94f4-df36dab4d383"/>
+      <field name="last_login_at" type="datetime" uuid="655401f8-323f-41a9-a8de-d06a9b550c01"/>
+      <field name="ip" type="string" size="15" uuid="f6f1ce1e-decb-440b-b447-1a97e8793ca3"/>
+      <orm-attributes>
+        <attribute name="table">users</attribute>
+      </orm-attributes>
+    </entity>
+    <association from="User" to="Client" caption="Group User" owner-alias="user" inverse-alias="client" uuid="cb965dbd-6c36-43b6-be73-a970d1f31654">
+      <association-field from="client_id" to="id"/>
+    </association>
+    <entity name="Role" uuid="bbc0c41c-98ec-41b7-a161-8d62ed83c9b0">
+      <field name="id" type="integer" required="true" unique="true" primary="true" auto-increment="true" uuid="4dac2a6d-2d84-4636-8e73-01f27a2cea06"/>
+      <field name="name" type="string" size="25" required="true" uuid="6ca123cc-f272-41e5-bb81-26067eb268f3"/>
+      <field name="description" type="string" size="255" uuid="d58dc281-4f00-4359-94c5-83e8a8c2c91c"/>
+    </entity>
+    <entity name="Client" uuid="507912fc-8689-49f5-bae5-db61c82abe4a">
+      <field name="id" type="integer" required="true" unique="true" primary="true" auto-increment="true" uuid="f99a00da-07b4-433c-83d4-2b0d31b59e72"/>
+      <field name="name" type="string" size="255" required="true" uuid="d7375945-b50e-4a25-9408-702ef88d76b4"/>
+      <field name="username" type="string" size="255" required="true" uuid="0969bcc0-8653-4aae-af76-96a1c5f227f0"/>
+    </entity>
+    <entity name="Site" uuid="d04841c8-0728-4bd7-adfc-8c2bc6548df9">
+      <field name="id" type="integer" required="true" unique="true" primary="true" auto-increment="true" uuid="e694b0f4-07d2-42ba-8603-f417ab2e1425"/>
+      <field name="client_id" type="integer" required="true" uuid="0aeabc02-7a2d-42e2-ae21-ff7b4bf27225"/>
+      <field name="name" type="string" size="100" required="true" uuid="4fc79f86-1695-4633-b6b3-d0b8f418739f"/>
+      <field name="host" type="string" size="100" required="true" uuid="4440fab6-b52a-47f3-a700-a2a92ebd18a8"/>
+      <field name="template" type="string" size="50" default="default" uuid="7b7ba431-1650-494d-b9bf-602e8832ab07"/>
+      <field name="params" type="text" uuid="c3b8c6d5-23c8-4f66-9d3c-69ef69f26170"/>
+      <orm-attributes>
+        <attribute name="table">sites</attribute>
+      </orm-attributes>
+    </entity>
+    <association from="Site" to="Client" caption="Client Site" owner-alias="site" inverse-alias="client" uuid="e6e3cce7-929e-4035-880c-0e0e45c272a3">
+      <association-field from="client_id" to="id"/>
+    </association>
+    <entity name="Queue" uuid="b8b77ad7-41c5-4b58-8b59-2d95cb326429">
+      <field name="id" type="integer" required="true" unique="true" primary="true" auto-increment="true" uuid="1701656b-d3dc-42fd-a9eb-19820f65bc08"/>
+      <field name="site_id" type="integer" required="true" uuid="b22c92d3-25d2-4522-8259-4d85a6166095"/>
+      <field name="status" type="string" size="10" required="true" uuid="ea8c4c72-e203-4c43-8bcd-9f2a86babf8d"/>
+      <field name="class" type="string" size="50" required="true" uuid="4606d3eb-3582-420b-bc29-34dd6d3c37af"/>
+      <field name="task" type="string" size="50" required="true" uuid="532ae5d7-5d99-4295-a26d-1c0b411fd0ac"/>
+      <field name="data" type="text" uuid="0a022d02-83ed-4a52-8ad8-85c2d261a5d3"/>
+      <field name="exec_at" type="datetime" required="true" uuid="8647d30a-40e0-42aa-96c3-3b011852fb22"/>
+    </entity>
+    <association from="Queue" to="Site" caption="Site Queue" owner-alias="queue" inverse-alias="site" uuid="4482ca86-ad96-481e-b73f-316abfe8529b">
+      <association-field from="site_id" to="id"/>
+    </association>
+    <entity name="Api" uuid="7fe6f4d5-0880-42f7-a231-a104ca742ec7">
+      <field name="id" type="integer" required="true" unique="true" primary="true" auto-increment="true" uuid="bd3394ef-8b7f-428f-94c6-82cc0748048c"/>
+      <field name="site_id" type="integer" required="true" uuid="2cff4b00-b870-4993-b80f-b84759085966"/>
+      <field name="name" type="string" size="100" required="true" uuid="b8709204-3446-4243-8405-98b1d4f5b952"/>
+      <field name="slug" type="string" size="50" required="true" uuid="3a2c2058-5045-4b11-a00c-75e44cd62e51"/>
+      <field name="class" type="string" size="255" required="true" uuid="f676c1ab-b940-45cc-ba6d-2c03f9d063f7"/>
+      <field name="version" type="string" size="25" uuid="3a6ee202-5478-4e31-b052-59542e4cc6f8"/>
+      <field name="user" type="string" size="100" uuid="617bbca1-8d8a-4893-8532-d4fd1b1bb9a7"/>
+      <field name="pass" type="string" size="255" uuid="112a8068-c986-4f01-bcb3-d36211ce265e"/>
+      <field name="signature" type="string" size="255" uuid="cd25d982-656a-4550-8a05-27b87f5e5f4e"/>
+      <field name="endpoint" type="string" size="255" uuid="eb714b7c-3604-45e3-b4db-ad3bf83668b9"/>
+      <field name="secret" type="string" size="255" uuid="da3ce32b-32d1-4355-8f7e-067f7e7ae8b1"/>
+      <field name="params" type="text" uuid="2eadb85b-9e54-43c0-ac60-476f2b09614b"/>
+    </entity>
+    <association from="Api" to="Site" caption="Site API" owner-alias="aPI" inverse-alias="site" uuid="4d237c6b-3248-48ca-89ad-d46f301597c3">
+      <association-field from="site_id" to="id"/>
+    </association>
+    <entity name="UserRole" uuid="5d235195-e231-41b9-99d9-772afdcb19a7">
+      <field name="id" type="integer" size="11" required="true" primary="true" auto-increment="true" uuid="423287fb-a4ce-441f-aa31-1c005046f9e6"/>
+      <field name="user_id" type="integer" size="11" required="true" primary="true" uuid="5cd10f06-b264-4d71-969b-65c53c415b39"/>
+      <field name="role_id" type="integer" size="11" required="true" primary="true" uuid="31f1835c-a4fb-416d-bb6a-1734d80859ae"/>
+    </entity>
+    <many-to-many mn-entity="UserRole" caption="User to Role" uuid="925c2b2f-665b-4db6-8a48-e84ed21bde9d">
+      <many-to-many-entity name="Role" owning-side="true" alias="role" uuid="0b5eb482-d776-4a41-b01b-ea36a673b732">
+        <many-to-many-field from="role_id" to="id"/>
+      </many-to-many-entity>
+      <many-to-many-entity name="User" owning-side="false" alias="user" uuid="d6ee3a17-2ef9-429c-8205-47e911a1398c">
+        <many-to-many-field from="user_id" to="id"/>
+      </many-to-many-entity>
+    </many-to-many>
+  </module>
+  <visual-data>
+    <association uuid="4482ca86-ad96-481e-b73f-316abfe8529b" color="4288059030"/>
+    <association uuid="4d237c6b-3248-48ca-89ad-d46f301597c3" color="4288059030"/>
+    <entity uuid="507912fc-8689-49f5-bae5-db61c82abe4a" bg-color="4294967295" hdr-color="4292006610" position-x="293" position-y="4" size-x="0" size-x2="115" size-y="0" size-y2="59"/>
+    <entity uuid="5d235195-e231-41b9-99d9-772afdcb19a7" bg-color="4294967295" hdr-color="4292006610" position-x="22" position-y="326" size-x="0" size-x2="89" size-y="0" size-y2="60"/>
+    <entity uuid="7fe6f4d5-0880-42f7-a231-a104ca742ec7" bg-color="4294967295" hdr-color="4292006610" position-x="649" position-y="251" size-x="0" size-x2="112" size-y="0" size-y2="185"/>
+    <many-to-many-association uuid="925c2b2f-665b-4db6-8a48-e84ed21bde9d" color="4288059030"/>
+    <project uuid="b1a41763-5ce8-4dee-938a-ddfa6aee9fcb" size-x="0" size-x2="949" size-y="0" size-y2="708"/>
+    <entity uuid="b8b77ad7-41c5-4b58-8b59-2d95cb326429" bg-color="4294967295" hdr-color="4292006610" position-x="483" position-y="378" size-x="0" size-x2="98" size-y="0" size-y2="115"/>
+    <entity uuid="bbc0c41c-98ec-41b7-a161-8d62ed83c9b0" bg-color="4294967295" hdr-color="4292006610" position-x="28" position-y="477" size-x="0" size-x2="119" size-y="0" size-y2="59"/>
+    <association uuid="cb965dbd-6c36-43b6-be73-a970d1f31654" color="4288059030"/>
+    <entity uuid="d04841c8-0728-4bd7-adfc-8c2bc6548df9" bg-color="4294967295" hdr-color="4292006610" position-x="353" position-y="161" size-x="0" size-x2="105" size-y="0" size-y2="101"/>
+    <association uuid="e6e3cce7-929e-4035-880c-0e0e45c272a3" color="4288059030"/>
+    <module uuid="e90dd201-08a8-45df-bef2-736fcb3d0961" bg-color="4293584113" position-x="61" position-y="72" size-x="11" size-x2="838" size-y="22" size-y2="586"/>
+    <entity uuid="f3ac07db-4585-4f65-ad3d-0b6dc65aeaba" bg-color="4294967295" hdr-color="4292006610" position-x="232" position-y="312" size-x="0" size-x2="112" size-y="0" size-y2="199"/>
+  </visual-data>
+</skipper>
