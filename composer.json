@@ -1,5 +1,5 @@
 {
-    "name": "crowefoote/ginny",
+    "name": "mattcrowe/ginny",
     "type": "development",
     "description": "MVC Code Generator",
     "keywords": [],
@@ -8,7 +8,7 @@
     "authors": [
         {
             "name": "Matt Crowe",
-            "email": "raventech@zym.me"
+            "email": "mattcrowe@zym.me"
         }
     ],
     "require": {
