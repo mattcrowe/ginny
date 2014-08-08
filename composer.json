@@ -22,9 +22,10 @@
         "icanboogie/inflector": "*"
     },
     "require-dev": {
+        "raveren/kint": "dev-master"
     },
     "suggest": {
-        "raveren/kint": "dev-master"
+        
     },
     "autoload": {
         "psr-0": { "Foote\\Ginny": "" }
