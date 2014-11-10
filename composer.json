@@ -15,15 +15,13 @@
         "php": ">=5.3.3",
         "doctrine/collections": "1.2.*@dev",
         "icanboogie/inflector": "*",
+        "raveren/kint": "dev-master"
         "symfony/console": "2.5.*",
         "symfony/yaml": "2.5.*",
         "symfony/filesystem": "2.5.*",
         "symfony/http-foundation": "2.5.*",
         "twig/twig": "~1.0",
         "twig/extensions": "~1.0"
-    },
-    "require-dev": {
-        "raveren/kint": "dev-master"
     },
     "suggest": {
         
