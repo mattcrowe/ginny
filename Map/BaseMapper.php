@@ -1,8 +1,8 @@
 <?php namespace Foote\Ginny\Map;
 /**
- * This file is part of the Ginny package: https://github.com/crowefoote/ginny
+ * This file is part of the Ginny package: https://github.com/mattcrowe/ginny
  *
- * (c) Matt Crowe <crowefoote@zym.me>
+ * (c) Matt Crowe <mattcrowe@zym.me>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -18,7 +18,7 @@ use Foote\Ginny\Command\GinnyInput;
 /**
  * SkipperXML parses a Skipper xml file into usable data map for a generator class
  *
- * @author Matt Crowe <crowefoote@zym.me>
+ * @author Matt Crowe <mattcrowe@zym.me>
  */
 class BaseMapper
 {

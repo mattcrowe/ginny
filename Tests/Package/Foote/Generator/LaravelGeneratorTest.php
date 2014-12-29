@@ -1,8 +1,8 @@
 <?php namespace Foote\Ginny\Tests\Pacakge\Foote\Mapper;
 /**
- * This file is part of the Ginny package: https://github.com/crowefoote/ginny
+ * This file is part of the Ginny package: https://github.com/mattcrowe/ginny
  *
- * (c) Matt Crowe <crowefoote@zym.me>
+ * (c) Matt Crowe <mattcrowe@zym.me>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
 /**
- * @author Matt Crowe <crowefoote@zym.me>
+ * @author Matt Crowe <mattcrowe@zym.me>
  */
 class LaravelGeneratorTest extends \PHPUnit_Framework_TestCase
 {

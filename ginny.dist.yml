@@ -1,10 +1,10 @@
 # @see \Foote\Ginny\Command\GinnyDefinition for full option list
 
 root:
-schema_path:      vendor/crowefoote/ginny/Foote/Ginny/Package/Foote/schemas/default/
+schema_path:      vendor/mattcrowe/ginny/Foote/Ginny/Package/Foote/schemas/default/
 schema_filename:  System.skipper
 target_path:      ginnydemo/
-template_path:    vendor/crowefoote/ginny/Foote/Ginny/Package/Foote/templates/laravel/default/
+template_path:    vendor/mattcrowe/ginny/Foote/Ginny/Package/Foote/templates/laravel/default/
 generator_class:  \Foote\Ginny\Package\Foote\Generator\LaravelGenerator
 bundle:           all
 model:            all
