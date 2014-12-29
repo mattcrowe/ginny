@@ -9,5 +9,6 @@ My vision is to have a resource that can use a schema file to generate not just 
 
 Additional information to follow.
 
-```$ php bin/ginny
+```
+$ php bin/ginny
 ```
