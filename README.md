@@ -8,3 +8,6 @@ My vision is to have a resource that can use a schema file to generate not just 
   schemas or use their own, like-wise for generator logic and templates.
 
 Additional information to follow.
+
+```$ php bin/ginny
+```
