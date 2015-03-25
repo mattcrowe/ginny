@@ -1,0 +1,13 @@
+# @see \Foote\Ginny\Command\GinnyDefinition for full option list
+
+root:
+schema_path:      Tests/schemas/
+schema_filename:  system.skipper.xml
+target_path:      Tests/target/foote/
+template_path:    Package/Foote/templates/laravel/default/
+generator_class:  \Foote\Ginny\Package\Foote\Generator\LaravelGenerator
+bundle:           all
+model:            User:Role:UserRole
+subset:           all
+extra:            all
+prefix:           Admin

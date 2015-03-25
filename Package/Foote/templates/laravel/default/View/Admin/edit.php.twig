@@ -1,0 +1,94 @@
+@extends('admin.main')
+
+@section('heading')
+<h1><i class="i-content"></i> <a href="{{ model.url }}">{{ model.plural }}</a> /
+    <strong>{{ "{{ $%s }}" | format(model.variable) }}</strong></h1>
+<div class="heading-right">
+    <button class="btn cantUndo" onclick="document.getElementById('main-delete').submit();">Delete</button>
+    <a class="btn" onclick="document.getElementById('main-form').submit();">Save</a>
+</div>
+@stop
+
+@section('content')
+
+{% set pattern = "
+{{ Form::model($%s, [
+'id' => 'main-delete',
+'url' => \"%s/$%s->id\",
+'method' => 'DELETE',
+]) }}
+{{ Form::close() }}" %}
+
+{{ pattern | format(model.variable, model.url, model.variable) }}
+
+{% set pattern = "
+{{ Form::model($%s, [
+'id' => 'main-form',
+'class' => 'form-admin',
+'url' => \"%s/$%s->id\",
+'method' => 'PUT',
+]) }}" %}
+
+{{ pattern | format(model.variable, model.url, model.variable) }}
+
+{% for relation in model.belongsTo %}
+
+    <div class="form-section">
+        <div class="form-section-details">
+            <h6>{{ relation.parent.title }}</h6>
+            <p></p>
+        </div>
+        <div class="form-section-panel">
+            <div class="panel">
+                <div class="panel-body">
+                    <div class="form-group">
+                        {% filter inline %}
+                        {{ "{{ Form::select('%s', $%s, Input::get('%s')) }}" | format(relation.local_key, relation.parent.variables, relation.local_key) }}
+                        {% endfilter %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endfor %}
+
+<div class="form-section">
+    <div class="form-section-details">
+        <h6>Main</h6>
+        <p></p>
+    </div>
+    <div class="form-section-panel">
+        <div class="panel">
+            <div class="panel-body">
+                {% for field in model.dataFields %}
+                    <div class="form-group">
+                        <label for="{{ field.variable }}">{{ field.title }}</label>
+                        {% filter inline %}
+                        {% if field.type == 'datetime' %}
+                            {{ "{{ Form::input('datetime-local', '%s', Input::get('%s')) }}" | format(field, field) }}
+                        {% elseif field.type == 'boolean' %}
+                            {{ "{{ Form::hidden('%s', false) }}" | format(field) }}
+                            {{ "{{ Form::checkbox('%s', true) }}" | format(field) }}
+                        {% elseif field.type == 'text' %}
+                            {{ "{{ Form::textarea('%s', Input::get('%s')) }}" | format(field, field) }}
+                        {% elseif field.name == 'email' %}
+                            {{ "{{ Form::email('%s', Input::get('%s')) }}" | format(field, field) }}
+                        {% else %}
+                            {{ "{{ Form::text('%s', Input::get('%s')) }}" | format(field, field) }}
+                        {% endif %}
+
+                        {% endfilter %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="form-footer">
+    <button class="btn">Save</button>
+</div>
+
+{{ '{{ Form::close() }}' }}
+
+@endsection

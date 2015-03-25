@@ -1,0 +1,13 @@
+# @see \Foote\Ginny\Command\GinnyDefinition for full option list
+
+root:
+schema_path:      Tests/schemas/
+schema_filename:  system.skipper.xml
+target_path:      Tests/target/base/
+template_path:    Tests/templates/
+generator_class:  \Foote\Ginny\Generator\BaseGenerator
+bundle:           all
+model:            all
+subset:           all
+extra:            all
+prefix:           Admin
