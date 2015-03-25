@@ -1,4 +1,5 @@
 <?php namespace Foote\Ginny\Map;
+
 /**
  * This file is part of the Ginny package: https://github.com/mattcrowe/ginny
  *
@@ -17,72 +18,76 @@ use Doctrine\Common\Collections\ArrayCollection as Collection;
 class BaseMap extends BaseItem
 {
 
-    public $prefix;
+  public $namespace;
+  public $prefix;
 
-    /**
-     * @var Collection|BaseBundle[]
-     */
-    public $bundles;
+  /**
+   * @var Collection|BaseBundle[]
+   */
+  public $bundles;
 
-    function __construct($name, $params = [])
-    {
-        parent::__construct($name, $params);
+  function __construct($name, $params = [])
+  {
+    parent::__construct($name, $params);
 
-        $this->prefix = $name;
+    $this->prefix = $name;
 
-        $this->bundles = new Collection();
+    $this->bundles = new Collection();
 
-        return $this;
+    return $this;
+  }
+
+  public function addBundle(BaseBundle $bundle)
+  {
+    if (!$this->bundles->containsKey($bundle->name)) {
+
+      $bundle->map = $this;
+
+      $this->bundles->set($bundle->name, $bundle);
     }
 
-    public function addBundle(BaseBundle $bundle)
-    {
-        if (!$this->bundles->containsKey($bundle->name)) {
+    return $this;
+  }
 
-            $bundle->map = $this;
+  /**
+   * {@inheritdoc}
+   */
+  public function dump()
+  {
 
-            $this->bundles->set($bundle->name, $bundle);
-        }
+    $dump['Map:' . $this->name] = [];
 
-        return $this;
+    foreach ($this->bundles as $bundle) {
+      $dump['Map:' . $this->name]['Bundle:' . $bundle->name] = $bundle->dump();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function dump() {
+    return $dump;
+  }
 
-        $dump['Map:' . $this->name] = [];
+  /**
+   * {@inheritdoc}
+   */
+  public function update()
+  {
 
-        foreach($this->bundles as $bundle) {
-            $dump['Map:' . $this->name]['Bundle:' . $bundle->name] = $bundle->dump();
-        }
+    //self update
 
-        return $dump;
+    foreach ($this->bundles as $bundle) {
+      $bundle->update();
     }
+  }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function update() {
+  /**
+   * {@inheritdoc}
+   */
+  public function validate()
+  {
 
-        //self update
+    //self validate
 
-        foreach($this->bundles as $bundle) {
-            $bundle->update();
-        }
+    foreach ($this->bundles as $bundle) {
+      $bundle->validate();
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validate() {
-
-        //self validate
-
-        foreach($this->bundles as $bundle) {
-            $bundle->validate();
-        }
-    }
+  }
 
 }

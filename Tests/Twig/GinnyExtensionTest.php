@@ -1,4 +1,5 @@
 <?php namespace Foote\Ginny\Tests\Command;
+
 /**
  * This file is part of the Ginny package: https://github.com/mattcrowe/ginny
  *
@@ -16,35 +17,35 @@ use Foote\Ginny\Twig\GinnyExtension;
 class GinnyExtensionTest extends \PHPUnit_Framework_TestCase
 {
 
-    /**
-     * covers \Foote\Ginny\Twig\GinnyExtension::getName
-     * covers \Foote\Ginny\Twig\GinnyExtension::getFilters
-     */
-    public function testblade()
-    {
+  /**
+   * covers \Foote\Ginny\Twig\GinnyExtension::getName
+   * covers \Foote\Ginny\Twig\GinnyExtension::getFilters
+   */
+  public function testblade()
+  {
 
-        $extension = new GinnyExtension();
+    $extension = new GinnyExtension();
 
-        $this->assertEquals($extension->getName(), 'ginny_extension');
+    $this->assertEquals($extension->getName(), 'ginny_extension');
 
-        $data = 'A
+    $data = 'A
 
         B';
 
-        /**
-         * @var $filter \Twig_SimpleFilter
-         */
-        foreach($extension->getFilters() as $filter) {
+    /**
+     * @var $filter \Twig_SimpleFilter
+     */
+    foreach ($extension->getFilters() as $filter) {
 
-            $callable = $filter->getCallable();
+      $callable = $filter->getCallable();
 
-            if ($filter->getName() == 'inline') {
-                $this->assertEquals($callable($data), 'A B');
-            };
-            if ($filter->getName() == 'spaceless') {
-                $this->assertEquals($callable($data), 'AB');
-            };
-        }
+      if ($filter->getName() == 'inline') {
+        $this->assertEquals($callable($data), 'A B');
+      };
+      if ($filter->getName() == 'spaceless') {
+        $this->assertEquals($callable($data), 'AB');
+      };
     }
+  }
 
 }

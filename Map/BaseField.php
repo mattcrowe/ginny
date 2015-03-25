@@ -1,4 +1,5 @@
 <?php namespace Foote\Ginny\Map;
+
 /**
  * This file is part of the Ginny package: https://github.com/mattcrowe/ginny
  *
@@ -19,105 +20,116 @@ use Foote\Ginny\Exception\GinnyMapException;
 class BaseField extends BaseItem
 {
 
-    public $name;
+  public $name;
 
-    public $model;
+  public $model;
 
-    public $type;
-    public $size;
-    public $default;
-    public $required = true;
-    public $unique = false;
-    public $primary = false;
-    public $autoIncrement = false;
-    public $owner = false;
+  public $type;
+  public $size;
+  public $default;
+  public $required = true;
+  public $unique = false;
+  public $primary = false;
+  public $autoIncrement = false;
+  public $owner = false;
 
-    public $_sensitive = ['hash', 'pass', 'password', 'salt', 'secret', 'signature', 'token'];
+  public $_sensitive = [
+    'id',
+    'hash',
+    'pass',
+    'password',
+    'salt',
+    'secret',
+    'signature',
+    'token'
+  ];
 
-    public static function create($name, $params=[]) {
+  public static function create($name, $params = [])
+  {
 
-        $field = new static($name, $params);
+    $field = new static($name, $params);
 
-        return $field;
+    return $field;
+  }
+
+  /**
+   * helper function to identify which fields to skip for index views, etc
+   *
+   * @return bool
+   */
+  public function sensitive()
+  {
+    if (in_array($this->name, $this->_sensitive)) {
+      return true;
     }
 
-    /**
-     * helper function to identify which fields to skip for index views, etc
-     *
-     * @return bool
-     */
-    public function sensitive()
-    {
-        if (in_array($this->name, $this->_sensitive)) {
-            return true;
-        }
+    return false;
+  }
 
-        return false;
+  /**
+   * {@inheritdoc}
+   */
+  public function dump()
+  {
+    $s = $this->name . ': ';
+
+    switch ($this->type) {
+      case 'string':
+        $s .= sprintf('%s(%s)', $this->type, $this->size);
+        break;
+      case 'integer':
+        $s .= sprintf('%s(%s)', $this->type, $this->size);
+        break;
+      default:
+        $s .= $this->type;
+        break;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function dump()
-    {
-        $s = $this->name . ': ';
+    $s .= $this->required ? '' : ', NULLABLE';
 
-        switch($this->type) {
-            case 'string':
-                $s .= sprintf('%s(%s)', $this->type, $this->size);
-                break;
-            case 'integer':
-                $s .= sprintf('%s(%s)', $this->type, $this->size);
-                break;
-            default:
-                $s .= $this->type;
-                break;
-        }
+    $s .= !$this->default ? '' : sprintf(", DEFAULT='%s'", $this->default);
 
-        $s .= $this->required ? '' : ', NULLABLE';
+    $s .= !$this->unique ? '' : ', UNIQUE';
 
-        $s .= !$this->default ? '' : sprintf(", DEFAULT='%s'", $this->default);
+    $s .= !$this->primary ? '' : ', PRIMARY';
 
-        $s .= !$this->unique ? '' : ', UNIQUE';
+    $s .= !$this->autoIncrement ? '' : ', AUTOINC';
 
-        $s .= !$this->primary ? '' : ', PRIMARY';
+    return $s;
+  }
 
-        $s .= !$this->autoIncrement ? '' : ', AUTOINC';
+  /**
+   * {@inheritdoc}
+   */
+  public function update()
+  {
+    if ($this->type == 'integer' && $this->size == 1) {
+      $this->type = 'boolean';
+    }
+  }
 
-        return $s;
+  /**
+   * {@inheritdoc}
+   */
+  public function validate()
+  {
+
+    # GinnyMapException::400
+    if (empty($this->type)) {
+      throw new GinnyMapException(
+        'BaseField::$type empty',
+        400
+      );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function update()
-    {
-        if ($this->type == 'integer' && $this->size == 1) {
-            $this->type = 'boolean';
-        }
+    # GinnyMapException::401
+    if (empty($this->model)) {
+      throw new GinnyMapException(
+        'BaseField::$model empty',
+        401
+      );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function validate() {
-
-        # GinnyMapException::400
-        if (empty($this->type)) {
-            throw new GinnyMapException(
-                'BaseField::$type empty',
-                400
-            );
-        }
-
-        # GinnyMapException::401
-        if (empty($this->model)) {
-            throw new GinnyMapException(
-                'BaseField::$model empty',
-                401
-            );
-        }
-
-    }
+  }
 
 }

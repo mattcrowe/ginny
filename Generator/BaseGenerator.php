@@ -1,4 +1,5 @@
 <?php namespace Foote\Ginny\Generator;
+
 /**
  * This file is part of the Ginny package: https://github.com/mattcrowe/ginny
  *
@@ -20,219 +21,220 @@ use Foote\Ginny\Map\BaseMapper;
 class BaseGenerator implements GeneratorInterface
 {
 
-    /**
-     * @var \Foote\Ginny\Map\BaseMap
-     */
-    public $map;
+  /**
+   * @var \Foote\Ginny\Map\BaseMap
+   */
+  public $map;
 
-    /**
-     * @var \Foote\Ginny\Map\BaseBundle
-     */
-    public $bundle;
+  /**
+   * @var \Foote\Ginny\Map\BaseBundle
+   */
+  public $bundle;
 
-    /**
-     * @var InputInterface
-     */
-    public $input;
+  /**
+   * @var InputInterface
+   */
+  public $input;
 
-    /**
-     * @var OutputInterface
-     */
-    public $output;
+  /**
+   * @var OutputInterface
+   */
+  public $output;
 
-    /**
-     * @var \Twig_Environment
-     */
-    public $twig;
+  /**
+   * @var \Twig_Environment
+   */
+  public $twig;
 
-    public $prefix;
-    public $target;
-    public $template;
-    public $schema;
+  public $prefix;
+  public $target;
+  public $template;
+  public $schema;
 
-    public function __construct(GinnyInput $input, OutputInterface $output)
-    {
+  public function __construct(GinnyInput $input, OutputInterface $output)
+  {
 
-        $this->input = $input;
-        $this->output = $output;
+    $this->input = $input;
+    $this->output = $output;
 
-        $this->target = $input->getFullTargetPath();
-        $this->template = $input->getFullTemplatePath();
-        $this->schema = $input->getFullSchemaPath();
+    $this->target = $input->getFullTargetPath();
+    $this->template = $input->getFullTemplatePath();
+    $this->schema = $input->getFullSchemaPath();
 
-        $this->map = $this->map();
+    $this->map = $this->map();
 
-//        s($this->map->dump());
-//        exit;
+    //s($this->map->dump());
+    //exit;
 
-        $this->loadTwig();
+    $this->loadTwig();
+  }
+
+  public function loadTwig()
+  {
+    $this->twig = new \Twig_Environment(new \Twig_Loader_String(), [
+      'debug' => true,
+      'autoescape' => false,
+    ]);
+
+    $this->twig->addExtension(new \Twig_Extension_Debug());
+    $this->twig->addExtension(new \Foote\Ginny\Twig\InflectorExtension());
+    $this->twig->addExtension(new \Foote\Ginny\Twig\GinnyExtension());
+
+    $this->extendTwig();
+  }
+
+  public function extendTwig()
+  {
+
+  }
+
+  public function map()
+  {
+
+    $xml = file_get_contents($this->schema);
+
+    $schema = \Foote\Ginny\Convert\SkipperXML::convert($xml);
+
+    $mapper = new BaseMapper($this->input);
+    $mapper->schema = json_decode(json_encode($schema));
+
+    return $mapper->map();
+  }
+
+  private function doOption($option, $name)
+  {
+    $options = explode(':', $this->input->getOption($option));
+
+    if (in_array('all', $options)) {
+      return true;
     }
 
-    public function loadTwig()
-    {
-        $this->twig = new \Twig_Environment(new \Twig_Loader_String(), [
-            'debug' => true,
-            'autoescape' => false,
-        ]);
-
-        $this->twig->addExtension(new \Twig_Extension_Debug());
-        $this->twig->addExtension(new \Foote\Ginny\Twig\InflectorExtension());
-        $this->twig->addExtension(new \Foote\Ginny\Twig\GinnyExtension());
-
-        $this->extendTwig();
+    if (in_array($name, $options)) {
+      return true;
     }
 
-    public function extendTwig()
-    {
+    return false;
+  }
 
-    }
+  public function doSubset($name)
+  {
+    return $this->doOption('subset', $name);
+  }
 
-    public function map()
-    {
+  public function doExtra($name)
+  {
+    return $this->doOption('extra', $name);
+  }
 
-        $xml = file_get_contents($this->schema);
+  public function doModel($name)
+  {
+    return $this->doOption('model', $name);
+  }
 
-        $schema = \Foote\Ginny\Convert\SkipperXML::convert($xml);
+  public function doBundle($name)
+  {
+    return $this->doOption('bundle', $name);
+  }
 
-        $mapper = new BaseMapper($this->input);
-        $mapper->schema = json_decode(json_encode($schema));
+  public function render($view, $parameters)
+  {
 
-        return $mapper->map();
-    }
+    $path = sprintf('%s%s.php.twig', $this->template, $view);
 
-    private function doOption($option, $name)
-    {
-        $options = explode(':', $this->input->getOption($option));
+    $content = file_get_contents($path);
 
-        if (in_array('all', $options)) {
-            return true;
-        }
+    return $this->twig->render($content, $parameters);
+  }
 
-        if (in_array($name, $options)) {
-            return true;
-        }
+  public function save($filename, $data)
+  {
 
+    if (file_exists($filename)) {
+      $contents = file_get_contents($filename);
+      if (strpos($contents, '#KEEP!') !== false) {
         return false;
+      }
     }
 
-    public function doSubset($name)
-    {
-        return $this->doOption('subset', $name);
-    }
+    return file_put_contents($filename, $data);
+  }
 
-    public function doExtra($name)
-    {
-        return $this->doOption('extra', $name);
-    }
+  public function generate()
+  {
 
-    public function doModel($name)
-    {
-        return $this->doOption('model', $name);
-    }
+    foreach ($this->map->bundles as $bundle) {
 
-    public function doBundle($name)
-    {
-        return $this->doOption('bundle', $name);
-    }
+      if (!$this->doBundle($bundle->name)) {
+        continue;
+      }
 
-    public function render($view, $parameters)
-    {
+      $this->bundle = $bundle;
 
-        $path = sprintf('%s%s.php.twig', $this->template, $view);
+      if ($this->doSubset('folders')) {
+        $this->genFolders();
+      }
 
-        $content = file_get_contents($path);
+      if ($this->doSubset('schema')) {
+        $this->genSchema();
+      }
 
-        return $this->twig->render($content, $parameters);
-    }
+      if ($this->doSubset('models')) {
+        $this->genModels();
+      }
 
-    public function save($filename, $data) {
+      if ($this->doSubset('fixtures')) {
+        $this->genFixtures();
+      }
 
-        if (file_exists($filename)) {
-            $contents = file_get_contents($filename);
-            if (strpos($contents, '#KEEP!') !== false) {
-                return false;
-            }
-        }
+      if ($this->doSubset('controllers')) {
+        $this->genControllers();
+      }
 
-        return file_put_contents($filename, $data);
-    }
+      if ($this->doSubset('views') || $this->doSubset('views-all')) {
+        $this->genViews();
+      }
 
-    public function generate()
-    {
-
-        foreach ($this->map->bundles as $bundle) {
-
-            if (!$this->doBundle($bundle->name)) {
-                continue;
-            }
-
-            $this->bundle = $bundle;
-
-            if ($this->doSubset('folders')) {
-                $this->genFolders();
-            }
-
-            if ($this->doSubset('schema')) {
-                $this->genSchema();
-            }
-
-            if ($this->doSubset('models')) {
-                $this->genModels();
-            }
-
-            if ($this->doSubset('fixtures')) {
-                $this->genFixtures();
-            }
-
-            if ($this->doSubset('controllers')) {
-                $this->genControllers();
-            }
-
-            if ($this->doSubset('views') || $this->doSubset('views-all')) {
-                $this->genViews();
-            }
-
-            if ($this->doSubset('tests') || $this->doSubset('tests-all')) {
-                $this->genTests();
-            }
-
-        }
+      if ($this->doSubset('tests') || $this->doSubset('tests-all')) {
+        $this->genTests();
+      }
 
     }
 
-    public function genSchema()
-    {
+  }
 
-    }
+  public function genSchema()
+  {
 
-    public function genFixtures()
-    {
+  }
 
-    }
+  public function genFixtures()
+  {
 
-    public function genFolders()
-    {
+  }
 
-    }
+  public function genFolders()
+  {
 
-    public function genModels()
-    {
+  }
 
-    }
+  public function genModels()
+  {
 
-    public function genControllers()
-    {
+  }
 
-    }
+  public function genControllers()
+  {
 
-    public function genViews()
-    {
+  }
 
-    }
+  public function genViews()
+  {
 
-    public function genTests()
-    {
+  }
 
-    }
+  public function genTests()
+  {
+
+  }
 
 }

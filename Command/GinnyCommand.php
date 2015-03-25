@@ -1,4 +1,5 @@
 <?php namespace Foote\Ginny\Command;
+
 /**
  * This file is part of the Ginny package: https://github.com/mattcrowe/ginny
  *
@@ -33,30 +34,30 @@ use Symfony\Component\Console\Command\Command;
 class GinnyCommand extends Command
 {
 
-    /**
-     * @inheritdoc
-     */
-    protected function configure()
-    {
-        $this->setName('ginny:generate');
-        $this->setDescription('generate MVC bundle for your favorite framework');
-        $this->setDefinition(new GinnyDefinition());
-    }
+  /**
+   * @inheritdoc
+   */
+  protected function configure()
+  {
+    $this->setName('ginny:generate');
+    $this->setDescription('generate MVC bundle for your favorite framework');
+    $this->setDefinition(new GinnyDefinition());
+  }
 
-    /**
-     * @inheritdoc
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
+  /**
+   * @inheritdoc
+   */
+  protected function execute(InputInterface $input, OutputInterface $output)
+  {
 
-        $genClass = $input->getOption('generator_class');
+    $genClass = $input->getOption('generator_class');
 
-        /* @var $generator \Foote\Ginny\Generator\GeneratorInterface */
-        $generator = new $genClass($input, $output);
+    /* @var $generator \Foote\Ginny\Generator\GeneratorInterface */
+    $generator = new $genClass($input, $output);
 
-        $generator->generate();
+    $generator->generate();
 
-        $output->writeln('Generated! Well, hopefully...');
-    }
+    $output->writeln('Generated! Well, hopefully...');
+  }
 
 }

@@ -1,4 +1,5 @@
 <?php namespace Foote\Ginny\Map;
+
 /**
  * This file is part of the Ginny package: https://github.com/mattcrowe/ginny
  *
@@ -21,282 +22,285 @@ use Foote\Ginny\Exception\GinnyMapException;
 class BaseModel extends BaseItem
 {
 
-    /**
-     * @var BaseBundle
-     */
+  /**
+   * @var BaseBundle
+   */
 
-    public $bundle;
+  public $bundle;
 
-    /**
-     * @var Collection|BaseField[]
-     */
-    public $fields;
+  /**
+   * @var Collection|BaseField[]
+   */
+  public $fields;
 
-    /**
-     * @var Collection|BaseAssociation[]
-     */
-    public $associations;
+  /**
+   * @var Collection|BaseAssociation[]
+   */
+  public $associations;
 
-    public $manyToMany = false;
+  public $manyToMany = false;
 
-    public $description;
-    public $namespace;
-    public $table;
-    public $route;
-    public $view;
-    public $url;
+  public $description;
+  public $namespace;
+  public $table;
+  public $route;
+  public $view;
+  public $url;
 
-    /**
-     * @param string $name
-     */
-    function __construct($name, $params=[])
-    {
-        parent::__construct($name, $params);
+  /**
+   * @param string $name
+   */
+  function __construct($name, $params = [])
+  {
+    parent::__construct($name, $params);
 
-        $this->fields = new Collection();
-        $this->associations = new Collection();
+    $this->fields = new Collection();
+    $this->associations = new Collection();
+  }
+
+  public function addField(BaseField $field)
+  {
+    if (!$this->fields->containsKey($field->name)) {
+
+      $field->model = $this;
+
+      $this->fields->set($field->name, $field);
     }
 
-    public function addField(BaseField $field)
-    {
-        if (!$this->fields->containsKey($field->name)) {
+    return $this;
+  }
 
-            $field->model = $this;
+  public function addAssociation(BaseAssociation $association)
+  {
+    if (!$this->associations->containsKey($association->name)) {
 
-            $this->fields->set($field->name, $field);
-        }
+      $association->models->set('owner', $this);
 
-        return $this;
+      $this->associations->set($association->name, $association);
     }
 
-    public function addAssociation(BaseAssociation $association)
-    {
-        if (!$this->associations->containsKey($association->name)) {
+    return $this;
+  }
 
-            $association->models->set('owner', $this);
+  /**
+   * @return Collection|static
+   */
+  function belongsTo()
+  {
+    return $this->associations->filter(function ($item) {
+      return $item->type == 'belongsTo' ? $item : null;
+    });
+  }
 
-            $this->associations->set($association->name, $association);
-        }
+  /**
+   * @return Collection|static
+   */
+  function belongsToMany()
+  {
+    return $this->associations->filter(function ($item) {
+      return $item->type == 'belongsToMany' ? $item : null;
+    });
+  }
 
-        return $this;
+  /**
+   * @return \Doctrine\Common\Collections\Collection|static
+   */
+  function hasOne()
+  {
+    return $this->associations->filter(function ($item) {
+      return $item->type == 'hasOne' ? $item : null;
+    });
+  }
+
+  /**
+   * @return \Doctrine\Common\Collections\Collection|static
+   */
+  function hasMany()
+  {
+    return $this->associations->filter(function ($item) {
+      return $item->type == 'hasMany' ? $item : null;
+    });
+  }
+
+  /**
+   * @return null|BaseModel
+   */
+  function parent()
+  {
+    $association = $this->belongsTo()->first();
+    if ($association && $association->owner) {
+      return $association->owner;
     }
 
-    /**
-     * @return Collection|static
-     */
-    function belongsTo()
-    {
-        return $this->associations->filter(function ($item) {
-            return $item->type == 'belongsTo' ? $item : NULL;
-        });
+    return null;
+  }
+
+  /**
+   * @return bool
+   */
+  function owns()
+  {
+    if (!$this->hasOne()->isEmpty() || !$this->hasMany()->isEmpty()) {
+      return true;
     }
 
-    /**
-     * @return Collection|static
-     */
-    function belongsToMany()
-    {
-        return $this->associations->filter(function ($item) {
-            return $item->type == 'belongsToMany' ? $item : NULL;
-        });
+    return false;
+  }
+
+  /**
+   * @return null|BaseModel[]
+   */
+  function children()
+  {
+    return $this->associations->filter(function ($item) {
+      return in_array($item->type, ['hasMany', 'hasOne']) ? $item : null;
+    });
+  }
+
+  /**
+   * @return Collection|static
+   */
+  function primaryFields()
+  {
+    return $this->fields->filter(function ($item) {
+      return $item->primary && $item->autoIncrement ? $item : null;
+    });
+  }
+
+  /**
+   * @return Collection|static
+   */
+  function ownedFields()
+  {
+    return $this->fields->filter(function ($item) {
+      return $item->owner ? $item : null;
+    });
+  }
+
+  /**
+   * @return Collection|static
+   */
+  function dataFields()
+  {
+    return $this->fields->filter(function ($item) {
+      return !$item->parent && !$item->primary ? $item : null;
+    });
+  }
+
+  /**
+   * @param $type
+   * @return Collection
+   */
+  function fieldsByType($type)
+  {
+    $results = new Collection();
+    foreach ($this->fields as $field) {
+      if ($field->type == $type) {
+        $results->set($field->name, $field);
+      }
     }
 
-    /**
-     * @return \Doctrine\Common\Collections\Collection|static
-     */
-    function hasOne()
-    {
-        return $this->associations->filter(function ($item) {
-            return $item->type == 'hasOne' ? $item : NULL;
-        });
+    return $results;
+  }
+
+  /**
+   * Guestimate the title field of the model.
+   *
+   * @return mixed
+   */
+  function titleField()
+  {
+    $keys = [
+      'title',
+      'name',
+      'host',
+      'url',
+      'email',
+    ];
+
+    foreach ($keys as $key) {
+      if ($this->fields->containsKey($key)) {
+        return $key;
+      }
     }
 
-    /**
-     * @return \Doctrine\Common\Collections\Collection|static
-     */
-    function hasMany()
-    {
-        return $this->associations->filter(function ($item) {
-            return $item->type == 'hasMany' ? $item : NULL;
-        });
+    return $this->fields->first()->name;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function dump()
+  {
+
+    $dump = [];
+
+    $newLine = "\n\t\t   ";
+
+    $fields = [];
+    foreach ($this->fields as $field) {
+      $fields[] = $field->dump();
     }
 
-    /**
-     * @return null|BaseModel
-     */
-    function parent()
-    {
-        $association = $this->belongsTo()->first();
-        if ($association && $association->owner) {
-            return $association->owner;
-        }
+    $dump['fields'] = $newLine . implode($newLine, $fields);
 
-        return NULL;
+    $associations = [];
+    foreach ($this->associations as $association) {
+      $associations[] = $association->dump();
     }
 
-    /**
-     * @return bool
-     */
-    function owns()
-    {
-        if (!$this->hasOne()->isEmpty() || !$this->hasMany()->isEmpty()) {
-            return true;
-        }
+    $dump['associations'] = $newLine . implode($newLine, $associations);
 
-        return false;
+    return $dump;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function update()
+  {
+
+    //self update
+
+    foreach ($this->fields as $field) {
+      $field->update();
+    }
+    foreach ($this->associations as $association) {
+      $association->update();
     }
 
-    /**
-     * @return null|BaseModel[]
-     */
-    function children()
-    {
-        return $this->associations->filter(function ($item) {
-            return in_array($item->type, ['hasMany', 'hasOne']) ? $item : NULL;
-        });
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function validate()
+  {
+
+    //self validate
+
+    # GinnyMapException::300
+    if (empty($this->bundle)) {
+      throw new GinnyMapException(
+        'BaseModel::$bundle empty',
+        300
+      );
     }
 
-    /**
-     * @return Collection|static
-     */
-    function primaryFields()
-    {
-        return $this->fields->filter(function ($item) {
-            return $item->primary && $item->autoIncrement ? $item : NULL;
-        });
+    # GinnyMapException::301
+    if ($this->fields->isEmpty()) {
+      throw new GinnyMapException(
+        'BaseModel::$fields empty',
+        301
+      );
     }
 
-    /**
-     * @return Collection|static
-     */
-    function ownedFields()
-    {
-        return $this->fields->filter(function ($item) {
-            return $item->owner ? $item : NULL;
-        });
+    foreach ($this->fields as $field) {
+      $field->validate();
     }
-
-    /**
-     * @return Collection|static
-     */
-    function dataFields()
-    {
-        return $this->fields->filter(function ($item) {
-            return !$item->parent && !$item->primary ? $item : NULL;
-        });
+    foreach ($this->associations as $association) {
+      $association->validate();
     }
-
-    /**
-     * @param $type
-     * @return Collection
-     */
-    function fieldsByType($type)
-    {
-        $results = new Collection();
-        foreach ($this->fields as $field) {
-            if ($field->type == $type) {
-                $results->set($field->name, $field);
-            }
-        }
-
-        return $results;
-    }
-
-    /**
-     * Guestimate the title field of the model.
-     *
-     * @return mixed
-     */
-    function titleField()
-    {
-        $keys = [
-            'title',
-            'name',
-            'host',
-            'url',
-            'email',
-        ];
-
-        foreach ($keys as $key) {
-            if ($this->fields->containsKey($key)) {
-                return $key;
-            }
-        }
-
-        return $this->fields->first()->name;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function dump() {
-
-        $dump = [];
-
-        $newLine = "\n\t\t   ";
-
-        $fields = [];
-        foreach($this->fields as $field) {
-            $fields[] = $field->dump();
-        }
-
-        $dump['fields'] = $newLine . implode($newLine, $fields);
-
-        $associations = [];
-        foreach($this->associations as $association) {
-            $associations[] = $association->dump();
-        }
-
-        $dump['associations'] = $newLine . implode($newLine, $associations);
-
-        return $dump;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function update() {
-
-        //self update
-
-        foreach($this->fields as $field) {
-            $field->update();
-        }
-        foreach($this->associations as $association) {
-            $association->update();
-        }
-
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validate() {
-
-        //self validate
-
-        # GinnyMapException::300
-        if (empty($this->bundle)) {
-            throw new GinnyMapException(
-                'BaseModel::$bundle empty',
-                300
-            );
-        }
-
-        # GinnyMapException::301
-        if ($this->fields->isEmpty()) {
-            throw new GinnyMapException(
-                'BaseModel::$fields empty',
-                301
-            );
-        }
-
-        foreach($this->fields as $field) {
-            $field->validate();
-        }
-        foreach($this->associations as $association) {
-            $association->validate();
-        }
-    }
+  }
 
 }

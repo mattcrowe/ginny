@@ -27,136 +27,136 @@ class {{ model.plural }}Controller extends BaseController
 
         $this->data['{{ model.variables }}'] = {{ model }}::all();
 
-        return View::make('{{ model.view }}.index', $this->data);
-    }
+return View::make('{{ model.view }}.index', $this->data);
+}
 
-    /**
-    * Show the form for creating a new {{ model.variable }}.
-    *
-    * @return Response
-    */
-    public function create()
-    {
-        $this->data['{{ model.variable }}'] = new {{ model }}();
+/**
+* Show the form for creating a new {{ model.variable }}.
+*
+* @return Response
+*/
+public function create()
+{
+$this->data['{{ model.variable }}'] = new {{ model }}();
 
-        {% for relation in model.belongsTo %}
-            $this->data['{{ relation.variables }}'] = {{ relation }}::all();
-        {% endfor %}
+{% for relation in model.belongsTo %}
+    $this->data['{{ relation.variables }}'] = {{ relation }}::all();
+{% endfor %}
 
-        return View::make('{{ model.view }}.create', $this->data);
-    }
+return View::make('{{ model.view }}.create', $this->data);
+}
 
-    /**
-    * Store a newly created {{ model.variable }} in storage.
-    *
-    * @return Response
-    */
-    public function store()
-    {
-    
-        $input = Input::all();
-        
-        $validator = Validator::make($input, {{ model }}::$rules);
-        
-        if ($validator->fails()) {
-            return Redirect::route('{{ model.route }}.create')
-            ->withErrors($validator)
-            ->withInput($input);
-        }
+/**
+* Store a newly created {{ model.variable }} in storage.
+*
+* @return Response
+*/
+public function store()
+{
 
-        ${{ model.variable }} = {{ model }}::create($input);
+$input = Input::all();
 
-        Session::flash('success', 'Success! {{ model }} created!');
+$validator = Validator::make($input, {{ model }}::$rules);
 
-        return Redirect::route('{{ model.route }}.show', [${{ model.variable }}->id]);
-    }
+if ($validator->fails()) {
+return Redirect::route('{{ model.route }}.create')
+->withErrors($validator)
+->withInput($input);
+}
 
-    /**
-    * Display the specified {{ model.variable }}.
-    *
-    * @param  int $id
-    * @return Response
-    */
-    public function show($id)
-    {
+${{ model.variable }} = {{ model }}::create($input);
 
-        ${{ model.variable }} = {{ model }}::findOrFail($id);
+Session::flash('success', 'Success! {{ model }} created!');
 
-        {% for relation in model.belongsTo %}
-            ${{ relation.parent.variable }} = ${{ model.variable }}->{{ relation.parent.variable }};
-        {% endfor %}
+return Redirect::route('{{ model.route }}.show', [${{ model.variable }}->id]);
+}
 
-        return View::make('{{ model.view }}.show', [
-            '{{ model.variable }}' => ${{ model.variable }},
-            {% for relation in model.belongsTo %}
-                '{{ relation.parent.variable }}' => ${{ relation.parent.variable }}
-            {% endfor %}
-        ]);
-    }
+/**
+* Display the specified {{ model.variable }}.
+*
+* @param  int $id
+* @return Response
+*/
+public function show($id)
+{
 
-    /**
-    * Show the form for editing the specified {{ model.variable }}.
-    *
-    * @param  int $id
-    * @return Response
-    */
-    public function edit($id)
-    {
+${{ model.variable }} = {{ model }}::findOrFail($id);
 
-        $this->data['{{ model.variable }}'] = ${{ model.variable }} = {{ model }}::findOrFail($id);
+{% for relation in model.belongsTo %}
+    ${{ relation.parent.variable }} = ${{ model.variable }}->{{ relation.parent.variable }};
+{% endfor %}
 
-        $this->data['{{ model.parent.variable }}'] = ${{ model.variable }}->{{ model.parent.variable }};
+return View::make('{{ model.view }}.show', [
+'{{ model.variable }}' => ${{ model.variable }},
+{% for relation in model.belongsTo %}
+    '{{ relation.parent.variable }}' => ${{ relation.parent.variable }}
+{% endfor %}
+]);
+}
 
-        {% for relation in model.belongsTo %}
-            $this->data['{{ relation.variables }}'] = {{ relation }}::all();
-        {% endfor %}
+/**
+* Show the form for editing the specified {{ model.variable }}.
+*
+* @param  int $id
+* @return Response
+*/
+public function edit($id)
+{
 
-        return View::make('{{ model.view }}.edit', $this->data);
-    }
+$this->data['{{ model.variable }}'] = ${{ model.variable }} = {{ model }}::findOrFail($id);
 
-    /**
-    * Update the specified {{ model.variable }} in storage.
-    *
-    * @param  int $id
-    * @return Response
-    */
-    public function update($id)
-    {
+$this->data['{{ model.parent.variable }}'] = ${{ model.variable }}->{{ model.parent.variable }};
 
-        $input = Input::all();
+{% for relation in model.belongsTo %}
+    $this->data['{{ relation.variables }}'] = {{ relation }}::all();
+{% endfor %}
 
-        $validator = Validator::make($input, {{ model }}::$rules);
+return View::make('{{ model.view }}.edit', $this->data);
+}
 
-        if ($validator->fails()) {
-            return Redirect::route('{{ model.route }}.edit', $id)
-            ->withErrors($validator)
-            ->withInput($input);
-        }
+/**
+* Update the specified {{ model.variable }} in storage.
+*
+* @param  int $id
+* @return Response
+*/
+public function update($id)
+{
 
-        ${{ model.variable }} = {{ model }}::findOrFail($id);
+$input = Input::all();
 
-        ${{ model.variable }}->update($input);
+$validator = Validator::make($input, {{ model }}::$rules);
 
-        Session::flash('success', 'Success! {{ model }} updated!');
+if ($validator->fails()) {
+return Redirect::route('{{ model.route }}.edit', $id)
+->withErrors($validator)
+->withInput($input);
+}
 
-        return Redirect::route('{{ model.route }}.show', [$id]);
-    }
+${{ model.variable }} = {{ model }}::findOrFail($id);
 
-    /**
-    * Remove the specified {{ model.variable }} from storage.
-    *
-    * @param  int $id
-    * @return Response
-    */
-    public function destroy($id)
-    {
-        ${{ model.variable }} = {{ model }}::findOrFail($id);
+${{ model.variable }}->update($input);
 
-        ${{ model.variable }}->delete();
+Session::flash('success', 'Success! {{ model }} updated!');
 
-        Session::flash('success', 'Success! {{ model }} deleted.');
+return Redirect::route('{{ model.route }}.show', [$id]);
+}
 
-        return Redirect::route('{{ model.route }}.index');
-    }
+/**
+* Remove the specified {{ model.variable }} from storage.
+*
+* @param  int $id
+* @return Response
+*/
+public function destroy($id)
+{
+${{ model.variable }} = {{ model }}::findOrFail($id);
+
+${{ model.variable }}->delete();
+
+Session::flash('success', 'Success! {{ model }} deleted.');
+
+return Redirect::route('{{ model.route }}.index');
+}
 
 }

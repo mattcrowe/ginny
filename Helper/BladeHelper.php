@@ -1,4 +1,5 @@
 <?php namespace Foote\Ginny\Helper;
+
 /**
  * This file is part of the Ginny package: https://github.com/mattcrowe/ginny
  *
@@ -22,49 +23,53 @@ use Foote\Ginny\Map\BaseItem;
 class BladeHelper
 {
 
-    /**
-     * creates snippet for Laravel's URL class
-     *
-     * @param $model BaseItem
-     * @param string $type
-     * @param bool $bracketed
-     * @return string
-     */
-    public static function url(BaseItem $model, $type = 'index', $bracketed = true)
-    {
+  /**
+   * creates snippet for Laravel's URL class
+   *
+   * @param $model BaseItem
+   * @param string $type
+   * @param bool $bracketed
+   * @return string
+   */
+  public static function url(
+    BaseItem $model,
+    $type = 'index',
+    $bracketed = true
+  ) {
 
-        if (in_array($type, ['show', 'edit', 'update', 'destroy'])) {
+    if (in_array($type, ['show', 'edit', 'update', 'destroy'])) {
 
-            $pattern = "URL::route('%s.%s', $%s->id)";
-            if ($bracketed) {
-                $pattern = "{{ URL::route('%s.%s', $%s->id) }}";
-            }
+      $pattern = "URL::route('%s.%s', $%s->id)";
+      if ($bracketed) {
+        $pattern = "{{ URL::route('%s.%s', $%s->id) }}";
+      }
 
-            return sprintf($pattern, $model->route, $type, $model->variable);
-        }
-
-        $pattern = "URL::route('%s.%s')";
-        if ($bracketed) {
-            $pattern = "{{ URL::route('%s.%s') }}";
-        }
-
-        return sprintf($pattern, $model->route, $type);
+      return sprintf($pattern, $model->route, $type, $model->variable);
     }
 
-    /**
-     * creates snippet for standalone object, ie. {{ $item }}
-     *
-     * @param $item BaseItem
-     * @param bool $owner
-     * @return string
-     */
-
-    public static function blade(BaseItem $item, $owner = false)
-    {
-        if ($owner && $item->owner) {
-            return sprintf('{{ $%s->%s }}', $item->variable(), $item->owner->variable());
-        }
-        return sprintf('{{ $%s }}', $item->variable());
+    $pattern = "URL::route('%s.%s')";
+    if ($bracketed) {
+      $pattern = "{{ URL::route('%s.%s') }}";
     }
+
+    return sprintf($pattern, $model->route, $type);
+  }
+
+  /**
+   * creates snippet for standalone object, ie. {{ $item }}
+   *
+   * @param $item BaseItem
+   * @param bool $owner
+   * @return string
+   */
+
+  public static function blade(BaseItem $item, $owner = false)
+  {
+    if ($owner && $item->owner) {
+      return sprintf('{{ $%s->%s }}', $item->variable(),
+        $item->owner->variable());
+    }
+    return sprintf('{{ $%s }}', $item->variable());
+  }
 
 }

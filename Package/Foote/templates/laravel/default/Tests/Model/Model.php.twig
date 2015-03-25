@@ -31,48 +31,48 @@ class {{ model }}Test extends \TestCase
         ${{ model.variable }} = new {{ model }}();
         ${{ model.variable }}->{{ model.titleField }} = 'test';
 
-        $this->assertEquals('test', ${{ model.variable }}->__toString());
+$this->assertEquals('test', ${{ model.variable }}->__toString());
 
-        $this->assertTrue(in_array('created_at', ${{ model.variable }}->getDates()));
-        $this->assertTrue(in_array('updated_at', ${{ model.variable }}->getDates()));
-        {% for field in model.fieldsByType('datetime') %}
-            $this->assertTrue(in_array('{{ field }}', ${{ model.variable }}->getDates()));
-        {% endfor %}
-    }
+$this->assertTrue(in_array('created_at', ${{ model.variable }}->getDates()));
+$this->assertTrue(in_array('updated_at', ${{ model.variable }}->getDates()));
+{% for field in model.fieldsByType('datetime') %}
+    $this->assertTrue(in_array('{{ field }}', ${{ model.variable }}->getDates()));
+{% endfor %}
+}
 
-    {% for field in model.fields %}
-    {% endfor %}
+{% for field in model.fields %}
+{% endfor %}
 
     {% if model.associations.empty == false %}
         /**
         {% for relation in model.belongsTo %}
-        * @covers {{ model.bundle }}\Model\{{ model }}::{{ relation.parent.variable }}
+            * @covers {{ model.bundle }}\Model\{{ model }}::{{ relation.parent.variable }}
         {% endfor %}
         {% for relation in model.belongsToMany %}
-        * @covers {{ model.bundle }}\Model\{{ model }}::{{ relation.parent.variables }}
+            * @covers {{ model.bundle }}\Model\{{ model }}::{{ relation.parent.variables }}
         {% endfor %}
         {% for relation in model.hasOne %}
-        * @covers {{ model.bundle }}\Model\{{ model }}::{{ relation.child.variable }}
+            * @covers {{ model.bundle }}\Model\{{ model }}::{{ relation.child.variable }}
         {% endfor %}
         {% for relation in model.hasMany %}
-        * @covers {{ model.bundle }}\Model\{{ model }}::{{ relation.child.variables }}
+            * @covers {{ model.bundle }}\Model\{{ model }}::{{ relation.child.variables }}
         {% endfor %}
         */
         public function testRelations()
         {
-            ${{ model.variable }} = new {{ model }}();
-            {% for relation in model.belongsTo %}
-                $this->assertNotEmpty(${{ model.variable }}->{{ relation.parent.variable }}());
-            {% endfor %}
-            {% for relation in model.belongsToMany %}
-                $this->assertNotEmpty(${{ model.variable }}->{{ relation.parent.variables }}());
-            {% endfor %}
-            {% for relation in model.hasOne %}
-                $this->assertNotEmpty(${{ model.variable }}->{{ relation.child.variable }}());
-            {% endfor %}
-            {% for relation in model.hasMany %}
-                $this->assertNotEmpty(${{ model.variable }}->{{ relation.child.variables }}());
-            {% endfor %}
+        ${{ model.variable }} = new {{ model }}();
+        {% for relation in model.belongsTo %}
+            $this->assertNotEmpty(${{ model.variable }}->{{ relation.parent.variable }}());
+        {% endfor %}
+        {% for relation in model.belongsToMany %}
+            $this->assertNotEmpty(${{ model.variable }}->{{ relation.parent.variables }}());
+        {% endfor %}
+        {% for relation in model.hasOne %}
+            $this->assertNotEmpty(${{ model.variable }}->{{ relation.child.variable }}());
+        {% endfor %}
+        {% for relation in model.hasMany %}
+            $this->assertNotEmpty(${{ model.variable }}->{{ relation.child.variables }}());
+        {% endfor %}
         }
     {% endif %}
 

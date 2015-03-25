@@ -5,10 +5,10 @@
  * https://github.com/mattcrowe/ginny
  */
 
-use DB;
+use DB, Session;
 use {{ model.bundle }}\Model\{{ model }};
 
-class {{ model.plural }}ControllerTest extends \WebTestCase
+class {{ model.plural }}ControllerTest extends \TestCase
 {
 
     public function test()
@@ -16,164 +16,184 @@ class {{ model.plural }}ControllerTest extends \WebTestCase
         $this->assertTrue(true);
     }
 
-    /**
-    * @covers \{{ model.bundle }}\Controller\Admin\{{ model.plural }}Controller::index
-    */
-    public function testindex()
+    public function setUp()
     {
-        $response = $this->call('GET', '{{ model.url }}');
-
-        $this->assertContains('{{ model.variable }}-index-1', $response->getContent());
-        $this->assertContains('{{ model.variable }}-index-2', $response->getContent());
-        $this->assertContains('{{ model.variable }}-index-3', $response->getContent());
-        $this->assertContains('{{ model.variable }}-index-4', $response->getContent());
-        $this->assertContains('{{ model.variable }}-index-5', $response->getContent());
+        parent::setUp();
+        Session::start();
+        $this->refreshDatabase();
     }
 
-    /**
-    * @covers \{{ model.bundle }}\Controller\Admin\{{ model.plural }}Controller::show
-    */
-    public function testshow()
-    {
-        ${{ model.variable }} = {{ model }}::find(1);
+/**
+* @covers \{{ model.bundle }}\Controller\Admin\{{ model.plural }}Controller::index
+*/
+public function testindex()
+{
+$response = $this->call('GET', '{{ model.url }}');
 
-        $response = $this->call('GET', '{{ model.url }}/1');
+$this->assertContains('{{ model.variable }}-index-1', $response->getContent());
+$this->assertContains('{{ model.variable }}-index-2', $response->getContent());
+$this->assertContains('{{ model.variable }}-index-3', $response->getContent());
+$this->assertContains('{{ model.variable }}-index-4', $response->getContent());
+$this->assertContains('{{ model.variable }}-index-5', $response->getContent());
+}
 
-        $this->assertEquals(${{ model.variable }}->id, $response->original['{{ model.variable }}']->id);
-    }
+/**
+* @covers \{{ model.bundle }}\Controller\Admin\{{ model.plural }}Controller::show
+*/
+public function testshow()
+{
+${{ model.variable }} = {{ model }}::find(1);
 
-    /**
-    * @covers \{{ model.bundle }}\Controller\Admin\{{ model.plural }}Controller::create
-    */
-    public function testcreate()
-    {
+$response = $this->call('GET', '{{ model.url }}/1');
 
-        $response = $this->call('GET', '{{ model.url }}/create');
+$this->assertEquals(${{ model.variable }}->id, $response->original['{{ model.variable }}']->id);
+}
 
-        $this->assertEquals(200, $response->getStatusCode());
-    }
+/**
+* @covers \{{ model.bundle }}\Controller\Admin\{{ model.plural }}Controller::create
+*/
+public function testcreate()
+{
 
-    /**
-    * @covers \{{ model.bundle }}\Controller\Admin\{{ model.plural }}Controller::edit
-    */
-    public function testedit()
-    {
-        ${{ model.variable }} = {{ model }}::find(1);
+$response = $this->call('GET', '{{ model.url }}/create');
 
-        $response = $this->call('GET', '{{ model.url }}/1/edit');
+$this->assertEquals(200, $response->getStatusCode());
+}
 
-        $this->assertEquals(${{ model.variable }}->id, $response->original['{{ model.variable }}']->id);
-    }
+/**
+* @covers \{{ model.bundle }}\Controller\Admin\{{ model.plural }}Controller::edit
+*/
+public function testedit()
+{
+${{ model.variable }} = {{ model }}::find(1);
 
-    /**
-    * @covers \{{ model.bundle }}\Controller\Admin\{{ model.plural }}Controller::destroy
-    */
-    public function testdestroy()
-    {
-        ${{ model.variable }} = {{ model }}::find(1);
-        
-        $this->assertEquals(1, ${{ model.variable }}->id);
+$response = $this->call('GET', '{{ model.url }}/1');
 
-        {% if model.owns != false %}
-            //test that item cannot be deleted if it has children items
-            $this->call('DELETE', '{{ model.url }}/1');
-            $this->assertEquals(1, ${{ model.variable }}->id);
+$this->assertEquals(${{ model.variable }}->id, $response->original['{{ model.variable }}']->id);
+}
+
+
+
+/**
+* @covers \{{ model.bundle }}\Controller\Admin\{{ model.plural }}Controller::update
+*/
+public function testupdate()
+{
+${{ model.variable }} = {{ model }}::find(1);
+
+$this->assertNotEquals('test', ${{ model.variable }}->name);
+
+$this->call('PUT', '{{ model.url }}/1', ['_token' => Session::token()]);
+
+$this->assertRedirectedTo('{{ model.url }}/1');
+
+${{ model.variable }} = {{ model }}::find(1);
+
+$this->assertNotEquals('test', ${{ model.variable }}->name);
+
+{% set fieldname = model.dataFields.first %}
+        {% if model.manyToMany != false %}
+            {% set fieldname = model.belongsTo.first.local_key %}
         {% endif %}
+${{ model.variable }}->{{ fieldname }} = 'test';
+
+$post = ${{ model.variable }}->attributesToArray();
+$post['_token'] = Session::token();
+$this->call('PUT', '{{ model.url }}/1', $post);
+
+${{ model.variable }} = {{ model }}::find(1);
+
+$this->assertEquals('test', ${{ model.variable }}->{{ fieldname }});
+
+$post = ${{ model.variable }}->attributesToArray();
+$post['_token'] = Session::token();
+
+$this->call('PUT', '{{ model.url }}/1', $post);
+$this->assertRedirectedTo('{{ model.url }}/1');
+
+$this->refreshDatabase();
+}
+
+/**
+* @covers \{{ model.bundle }}\Controller\Admin\{{ model.plural }}Controller::store
+*/
+public function teststore()
+{
+
+$last = DB::table('{{ model.table }}')->orderBy('id', 'desc')->first();
+
+$this->call('POST', '{{ model.url }}', ['_token' => Session::token()]);
+
+$this->assertRedirectedTo('{{ model.url }}/create');
+
+$next = DB::table('{{ model.table }}')->orderBy('id', 'desc')->first();
+
+$this->assertEquals($last->id, $next->id);
+
+$post = [
+{% for relation in model.belongsTo %}
+    {{ "'%s' => 1," | format(relation.local_key) }}
+{% endfor %}
+                    {% for field in model.dataFields %}
+                        {% filter inline %}
+                        {{ "'%s' => '111'," | format(field.name) }}
+                        {% endfilter %}
+                    {% endfor %}
+];
+
+$post['_token'] = Session::token();
+$this->call('POST', '{{ model.url }}', $post);
+
+$next = DB::table('{{ model.table }}')->orderBy('id', 'desc')->first();
+
+$this->assertGreaterThan($last->id, $next->id);
+
+$this->call('POST', '{{ model.url }}', $post);
+
+$next = DB::table('{{ model.table }}')->orderBy('id', 'desc')->first();
+
+$this->assertRedirectedTo('{{ model.url }}/' . $next->id);
+
+$this->refreshDatabase();
+}
+
+/**
+* @covers \{{ model.bundle }}\Controller\Admin\{{ model.plural }}Controller::destroy
+*/
+public function testdestroy()
+{
+${{ model.variable }} = {{ model }}::find(1);
+
+$this->assertEquals(1, ${{ model.variable }}->id);
+
+{% if model.owns != false %}
+    //test that item cannot be deleted if it has children items
+    $this->call('DELETE', '{{ model.url }}/1');
+    $this->assertEquals(1, ${{ model.variable }}->id);
+{% endif %}
 
         {% for child in model.hasOne %}
             ${{ model.variable }}->{{ child.variable }}->delete();
         {% endfor %}
         {% for child in model.hasMany %}
             foreach(${{ model.variable }}->{{ child.variables }} as ${{ child.variable }}) {
-                ${{ child.variable }}->delete();
+            ${{ child.variable }}->delete();
             }
         {% endfor %}
-        
-        $this->call('DELETE', '{{ model.url }}/1');
-        
-        ${{ model.variable }} = {{ model }}::find(1);
-        
-        $this->assertEmpty(${{ model.variable }});
-        
-        $this->refreshDatabase();
-    }
 
-    /**
-    * @covers \{{ model.bundle }}\Controller\Admin\{{ model.plural }}Controller::update
-    */
-    public function testupdate()
-    {
-        ${{ model.variable }} = {{ model }}::find(1);
-        
-        $this->assertNotEquals('test', ${{ model.variable }}->name);
+$this->call('DELETE', '{{ model.url }}/1', ['_token' => Session::token()]);
 
-        $this->call('PUT', '{{ model.url }}/1', []);
+${{ model.variable }} = {{ model }}::find(1);
 
-        $this->assertRedirectedTo('{{ model.url }}/1/edit');
+$this->assertEmpty(${{ model.variable }});
 
-        ${{ model.variable }} = {{ model }}::find(1);
+$this->refreshDatabase();
+}
 
-        $this->assertNotEquals('test', ${{ model.variable }}->name);
-
-        {% set fieldname = model.dataFields.first %}
-        {% if model.manyToMany != false %}
-            {% set fieldname = model.belongsTo.first.local_key %}
-        {% endif %}
-        ${{ model.variable }}->{{ fieldname }} = 'test';
-        
-        $this->call('PUT', '{{ model.url }}/1', ${{ model.variable }}->attributesToArray());
-        
-        ${{ model.variable }} = {{ model }}::find(1);
-        
-        $this->assertEquals('test', ${{ model.variable }}->{{ fieldname }});
-
-        $post = ${{ model.variable }}->attributesToArray();
-        $post['_task']['save-and-close'] = true;
-
-        $this->call('PUT', '{{ model.url }}/1', $post);
-        $this->assertRedirectedTo('{{ model.url }}/1');
-        
-        $this->refreshDatabase();
-    }
-
-    /**
-    * @covers \{{ model.bundle }}\Controller\Admin\{{ model.plural }}Controller::store
-    */
-    public function teststore()
-    {
-
-        $last = DB::table('{{ model.table }}')->orderBy('id', 'desc')->first();
-
-        $this->call('POST', '{{ model.url }}', []);
-
-        $this->assertRedirectedTo('{{ model.url }}/create');
-
-        $next = DB::table('{{ model.table }}')->orderBy('id', 'desc')->first();
-
-        $this->assertEquals($last->id, $next->id);
-
-        $post = [
-        {% for relation in model.belongsTo %}
-            {{ "'%s' => 1," | format(relation.local_key) }}
-        {% endfor %}
-                    {% for field in model.dataFields %}
-                        {% filter inline %}
-                        {{ "'%s' => '111'," | format(field.name) }}
-                        {% endfilter %}
-                    {% endfor %}
-        ];
-
-        $this->call('POST', '{{ model.url }}', $post);
-
-        $next = DB::table('{{ model.table }}')->orderBy('id', 'desc')->first();
-
-        $this->assertGreaterThan($last->id, $next->id);
-
-        $post['_task']['save-and-close'] = true;
-        $this->call('POST', '{{ model.url }}', $post);
-        $this->assertRedirectedTo('{{ model.url }}');
-
-        $this->refreshDatabase();
-    }
+public function refreshDatabase()
+{
+exec('rm ' . storage_path().'/database.sqlite');
+exec('cp ' . storage_path().'/stub.sqlite ' . storage_path().'/database.sqlite');
+}
 
 }

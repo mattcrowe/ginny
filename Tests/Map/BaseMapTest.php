@@ -1,4 +1,5 @@
 <?php namespace Foote\Ginny\Tests\Map;
+
 /**
  * This file is part of the Ginny package: https://github.com/mattcrowe/ginny
  *
@@ -20,105 +21,106 @@ use Foote\Ginny\Map\BaseAssociation;
 class BaseMapTest extends \PHPUnit_Framework_TestCase
 {
 
-    /**
-     * @covers Foote\Ginny\Map\BaseMap::__construct
-     * @covers Foote\Ginny\Map\BaseMap::addBundle
-     */
-    public function test()
-    {
+  /**
+   * @covers Foote\Ginny\Map\BaseMap::__construct
+   * @covers Foote\Ginny\Map\BaseMap::addBundle
+   */
+  public function test()
+  {
 
-        $map = new BaseMap('Admin');
+    $map = new BaseMap('Admin');
 
-        $map->addBundle(new BaseBundle('BigThing'));
+    $map->addBundle(new BaseBundle('BigThing'));
 
-        $this->assertEquals($map->name, 'Admin');
-        $this->assertEquals($map->prefix, 'Admin');
-        $this->assertEquals($map->snake, 'admin');
+    $this->assertEquals($map->name, 'Admin');
+    $this->assertEquals($map->prefix, 'Admin');
+    $this->assertEquals($map->snake, 'admin');
 
-        $this->assertInstanceOf('\Doctrine\Common\Collections\ArrayCollection', $map->bundles);
+    $this->assertInstanceOf('\Doctrine\Common\Collections\ArrayCollection',
+      $map->bundles);
 
-        $this->assertFalse($map->bundles->isEmpty());
-    }
+    $this->assertFalse($map->bundles->isEmpty());
+  }
 
-    /**
-     * @covers Foote\Ginny\Map\BaseMap::dump
-     */
-    public function testdump()
-    {
+  /**
+   * @covers Foote\Ginny\Map\BaseMap::dump
+   */
+  public function testdump()
+  {
 
-        $map = new BaseMap('Admin');
-        $map->addBundle(new BaseBundle('Bundle'));
+    $map = new BaseMap('Admin');
+    $map->addBundle(new BaseBundle('Bundle'));
 
-        $this->assertNotEmpty($map->dump());
-    }
+    $this->assertNotEmpty($map->dump());
+  }
 
-    /**
-     * @covers Foote\Ginny\Map\BaseMap::update
-     */
-    public function testupdate()
-    {
+  /**
+   * @covers Foote\Ginny\Map\BaseMap::update
+   */
+  public function testupdate()
+  {
 
-        $field = new BaseField('name');
-        $field->type = 'integer';
-        $field->size = 1;
+    $field = new BaseField('name');
+    $field->type = 'integer';
+    $field->size = 1;
 
-        $model = new BaseModel('Thing');
-        $model->addField($field);
+    $model = new BaseModel('Thing');
+    $model->addField($field);
 
-        $bundle = new BaseBundle('Bundle');
-        $bundle->addModel($model);
+    $bundle = new BaseBundle('Bundle');
+    $bundle->addModel($model);
 
-        $map = new BaseMap('Admin');
-        $map->addBundle($bundle);
-        $map->update();
+    $map = new BaseMap('Admin');
+    $map->addBundle($bundle);
+    $map->update();
 
-        //ensure $field->update() was invoked by $bundle->update()
-        $this->assertEquals('boolean', $field->type);
-    }
+    //ensure $field->update() was invoked by $bundle->update()
+    $this->assertEquals('boolean', $field->type);
+  }
 
-    /**
-     * @covers Foote\Ginny\Map\BaseMap::validate
-     */
-    public function testValidatesOK()
-    {
+  /**
+   * @covers Foote\Ginny\Map\BaseMap::validate
+   */
+  public function testValidatesOK()
+  {
 
-        $field = new BaseField('name');
-        $field->type = 'string';
+    $field = new BaseField('name');
+    $field->type = 'string';
 
-        $model = new BaseModel('Thing');
-        $model->addField($field);
+    $model = new BaseModel('Thing');
+    $model->addField($field);
 
-        $bundle = new BaseBundle('Bundle');
-        $bundle->addModel($model);
+    $bundle = new BaseBundle('Bundle');
+    $bundle->addModel($model);
 
-        $map = new BaseMap('Admin');
-        $map->addBundle($bundle);
-        $map->validate();
+    $map = new BaseMap('Admin');
+    $map->addBundle($bundle);
+    $map->validate();
 
-        //all is good, no exceptions
-        $this->assertTrue(true);
-    }
+    //all is good, no exceptions
+    $this->assertTrue(true);
+  }
 
-    /**
-     * @covers Foote\Ginny\Map\BaseMap::validate
-     *
-     * @expectedException \Foote\Ginny\Exception\GinnyMapException
-     * @expectedExceptionCode 301
-     */
-    public function testInvalidModel()
-    {
+  /**
+   * @covers Foote\Ginny\Map\BaseMap::validate
+   *
+   * @expectedException \Foote\Ginny\Exception\GinnyMapException
+   * @expectedExceptionCode 301
+   */
+  public function testInvalidModel()
+  {
 
-        $model = new BaseModel('Thing');
+    $model = new BaseModel('Thing');
 
-        $bundle = new BaseBundle('Bundle');
-        $bundle->addModel($model);
+    $bundle = new BaseBundle('Bundle');
+    $bundle->addModel($model);
 
-        $map = new BaseMap('Admin');
-        $map->addBundle($bundle);
+    $map = new BaseMap('Admin');
+    $map->addBundle($bundle);
 
-        //additional model validations tested inside BaseBundleTest
-        $map->validate();
-    }
+    //additional model validations tested inside BaseBundleTest
+    $map->validate();
+  }
 
 
 }

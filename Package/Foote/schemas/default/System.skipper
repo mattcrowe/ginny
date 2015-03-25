@@ -16,7 +16,7 @@
       <field name="last_login_at" type="datetime" uuid="655401f8-323f-41a9-a8de-d06a9b550c01"/>
       <field name="ip" type="string" size="15" uuid="f6f1ce1e-decb-440b-b447-1a97e8793ca3"/>
       <orm-attributes>
-        <attribute name="table">users</attribute>
+        <attribute name="table">system_users</attribute>
       </orm-attributes>
     </entity>
     <association from="User" to="Client" caption="Group User" owner-alias="user" inverse-alias="client" uuid="cb965dbd-6c36-43b6-be73-a970d1f31654">
@@ -40,7 +40,7 @@
       <field name="template" type="string" size="50" default="default" uuid="7b7ba431-1650-494d-b9bf-602e8832ab07"/>
       <field name="params" type="text" uuid="c3b8c6d5-23c8-4f66-9d3c-69ef69f26170"/>
       <orm-attributes>
-        <attribute name="table">sites</attribute>
+        <attribute name="table">system_sites</attribute>
       </orm-attributes>
     </entity>
     <association from="Site" to="Client" caption="Client Site" owner-alias="site" inverse-alias="client" uuid="e6e3cce7-929e-4035-880c-0e0e45c272a3">

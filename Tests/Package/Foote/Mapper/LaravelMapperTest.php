@@ -1,4 +1,5 @@
 <?php namespace Foote\Ginny\Tests\Pacakge\Foote\Mapper;
+
 /**
  * This file is part of the Ginny package: https://github.com/mattcrowe/ginny
  *
@@ -17,25 +18,26 @@ use Foote\Ginny\Package\Foote\Mapper\LaravelMapper;
 class LaravelMapperTest extends \PHPUnit_Framework_TestCase
 {
 
-    /**
-     * Foote\Ginny\Package\Foote\Mapper\LaravelMapper::get
-     */
-    public function testget()
-    {
+  /**
+   * Foote\Ginny\Package\Foote\Mapper\LaravelMapper::get
+   */
+  public function testget()
+  {
 
-        $mapper = new SkipperXML('Admin', __DIR__ . '/../../../../Package/Foote/schemas/default/System.skipper');
+    $mapper = new SkipperXML('Admin',
+      __DIR__ . '/../../../../Package/Foote/schemas/default/System.skipper');
 
-        $map = $mapper->map();
+    $map = $mapper->map();
 
-        $user = $map->bundles->get('System')->models->get('User');
+    $user = $map->bundles->get('System')->models->get('User');
 
-        $this->assertEmpty($user->url);
-        $this->assertEmpty($user->route);
+    $this->assertEmpty($user->url);
+    $this->assertEmpty($user->route);
 
-        $map = LaravelMapper::get($map);
+    $map = LaravelMapper::get($map);
 
-        $this->assertNotEmpty($user->url);
-        $this->assertNotEmpty($user->route);
-    }
+    $this->assertNotEmpty($user->url);
+    $this->assertNotEmpty($user->route);
+  }
 
 }

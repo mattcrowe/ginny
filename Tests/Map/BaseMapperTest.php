@@ -1,4 +1,5 @@
 <?php namespace Foote\Ginny\Tests\Map;
+
 /**
  * This file is part of the Ginny package: https://github.com/mattcrowe/ginny
  *
@@ -18,108 +19,108 @@ use Foote\Ginny\Command\GinnyDefinition;
 class BaseMapperTest extends \PHPUnit_Framework_TestCase
 {
 
+  /**
+   * @covers Foote\Ginny\Mapper\BaseMapper::__construct
+   * @covers Foote\Ginny\Mapper\BaseMapper::map
+   */
+  public function test()
+  {
+
+    $yaml = new \Symfony\Component\Yaml\Parser();
+    $local_defaults = $yaml->parse(file_get_contents(__DIR__ . '/../configs/default.yml'));
+    $local_defaults['root'] = __DIR__ . '/../../';
+
+    $input = new GinnyInput($local_defaults);
+
+    $input->bind(new GinnyDefinition());
+
+    $mapper = new BaseMapper($input);
+
+    $xml = file_get_contents(__DIR__ . '/../schemas/system.skipper.xml');
+    $schema = \Foote\Ginny\Convert\SkipperXML::convert($xml);
+    $mapper->schema = json_decode(json_encode($schema));
+
+    $map = $mapper->map();
+
+    $this->assertEquals('Admin', $map->name);
+    $this->assertEquals('Admin', $map->prefix);
+
+    $this->assertTrue($map->bundles->containsKey('System'));
+    //$this->assertTrue($map->bundles->containsKey('OtherBundle'));
+
     /**
-     * @covers Foote\Ginny\Mapper\BaseMapper::__construct
-     * @covers Foote\Ginny\Mapper\BaseMapper::map
+     * test for some expected models, fields, and associations
+     *
+     * Client hasMany User
+     *
+     * User belongsTo Client
+     * User hasOne Profile
+     * User belongsToMany Role
+     *
+     * Role belongsToMany User
+     *
+     * Profile belongsTo User
+     * Profile belongsTo OtherBundle\Model\Outside
+     *
+     * UserRole belongsTo User
+     * UserRole belongsTo Role
      */
-    public function test()
-    {
 
-        $yaml = new \Symfony\Component\Yaml\Parser();
-        $local_defaults = $yaml->parse(file_get_contents(__DIR__ . '/../configs/default.yml'));
-        $local_defaults['root'] = __DIR__ . '/../../';
+    //test the first bundle...
 
-        $input = new GinnyInput($local_defaults);
+    $bundle = $map->bundles->first();
 
-        $input->bind(new GinnyDefinition());
+    $this->assertTrue($bundle->models->containsKey('Client'));
+    $this->assertTrue($bundle->models->containsKey('User'));
+    $this->assertTrue($bundle->models->containsKey('Role'));
+    $this->assertTrue($bundle->models->containsKey('Profile'));
+    $this->assertTrue($bundle->models->containsKey('UserRole'));
 
-        $mapper = new BaseMapper($input);
+    foreach ($bundle->models as $model) {
 
-        $xml = file_get_contents(__DIR__ . '/../schemas/system.skipper.xml');
-        $schema = \Foote\Ginny\Convert\SkipperXML::convert($xml);
-        $mapper->schema = json_decode(json_encode($schema));
+      $this->assertFalse($model->fields->isEmpty());
 
-        $map = $mapper->map();
+      if ($model->name == 'Client') {
+        $this->assertFalse($model->associations->isEmpty());
+        $this->assertTrue($model->hasOne()->isEmpty());
+        $this->assertFalse($model->hasMany()->isEmpty());
+        $this->assertTrue($model->belongsTo()->isEmpty());
+        $this->assertTrue($model->belongsToMany()->isEmpty());
+      }
 
-        $this->assertEquals('Admin', $map->name);
-        $this->assertEquals('Admin', $map->prefix);
+      if ($model->name == 'User') {
+        $this->assertFalse($model->associations->isEmpty());
+        $this->assertFalse($model->hasOne()->isEmpty());
+        $this->assertTrue($model->hasMany()->isEmpty());
+        $this->assertFalse($model->belongsTo()->isEmpty());
+        $this->assertFalse($model->belongsToMany()->isEmpty());
+      }
 
-        $this->assertTrue($map->bundles->containsKey('System'));
-        //$this->assertTrue($map->bundles->containsKey('OtherBundle'));
+      if ($model->name == 'Role') {
+        $this->assertFalse($model->associations->isEmpty());
+        $this->assertTrue($model->hasOne()->isEmpty());
+        $this->assertTrue($model->hasMany()->isEmpty());
+        $this->assertTrue($model->belongsTo()->isEmpty());
+        $this->assertFalse($model->belongsToMany()->isEmpty());
+      }
 
-        /**
-         * test for some expected models, fields, and associations
-         *
-         * Client hasMany User
-         *
-         * User belongsTo Client
-         * User hasOne Profile
-         * User belongsToMany Role
-         *
-         * Role belongsToMany User
-         *
-         * Profile belongsTo User
-         * Profile belongsTo OtherBundle\Model\Outside
-         *
-         * UserRole belongsTo User
-         * UserRole belongsTo Role
-         */
+      if ($model->name == 'UserRole') {
+        $this->assertFalse($model->associations->isEmpty());
+        $this->assertTrue($model->hasOne()->isEmpty());
+        $this->assertTrue($model->hasMany()->isEmpty());
+        $this->assertFalse($model->belongsTo()->isEmpty());
+        $this->assertTrue($model->belongsToMany()->isEmpty());
+      }
 
-        //test the first bundle...
+      if ($model->name == 'Profile') {
+        $this->assertFalse($model->associations->isEmpty());
+        $this->assertTrue($model->hasOne()->isEmpty());
+        $this->assertTrue($model->hasMany()->isEmpty());
+        $this->assertFalse($model->belongsTo()->isEmpty());
+        $this->assertTrue($model->belongsToMany()->isEmpty());
+      }
 
-        $bundle = $map->bundles->first();
-
-        $this->assertTrue($bundle->models->containsKey('Client'));
-        $this->assertTrue($bundle->models->containsKey('User'));
-        $this->assertTrue($bundle->models->containsKey('Role'));
-        $this->assertTrue($bundle->models->containsKey('Profile'));
-        $this->assertTrue($bundle->models->containsKey('UserRole'));
-
-        foreach($bundle->models as $model) {
-
-            $this->assertFalse($model->fields->isEmpty());
-
-            if ($model->name == 'Client') {
-                $this->assertFalse($model->associations->isEmpty());
-                $this->assertTrue($model->hasOne()->isEmpty());
-                $this->assertFalse($model->hasMany()->isEmpty());
-                $this->assertTrue($model->belongsTo()->isEmpty());
-                $this->assertTrue($model->belongsToMany()->isEmpty());
-            }
-
-            if ($model->name == 'User') {
-                $this->assertFalse($model->associations->isEmpty());
-                $this->assertFalse($model->hasOne()->isEmpty());
-                $this->assertTrue($model->hasMany()->isEmpty());
-                $this->assertFalse($model->belongsTo()->isEmpty());
-                $this->assertFalse($model->belongsToMany()->isEmpty());
-            }
-
-            if ($model->name == 'Role') {
-                $this->assertFalse($model->associations->isEmpty());
-                $this->assertTrue($model->hasOne()->isEmpty());
-                $this->assertTrue($model->hasMany()->isEmpty());
-                $this->assertTrue($model->belongsTo()->isEmpty());
-                $this->assertFalse($model->belongsToMany()->isEmpty());
-            }
-
-            if ($model->name == 'UserRole') {
-                $this->assertFalse($model->associations->isEmpty());
-                $this->assertTrue($model->hasOne()->isEmpty());
-                $this->assertTrue($model->hasMany()->isEmpty());
-                $this->assertFalse($model->belongsTo()->isEmpty());
-                $this->assertTrue($model->belongsToMany()->isEmpty());
-            }
-
-            if ($model->name == 'Profile') {
-                $this->assertFalse($model->associations->isEmpty());
-                $this->assertTrue($model->hasOne()->isEmpty());
-                $this->assertTrue($model->hasMany()->isEmpty());
-                $this->assertFalse($model->belongsTo()->isEmpty());
-                $this->assertTrue($model->belongsToMany()->isEmpty());
-            }
-
-        }
     }
+  }
 
 }

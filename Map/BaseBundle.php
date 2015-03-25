@@ -1,4 +1,5 @@
 <?php namespace Foote\Ginny\Map;
+
 /**
  * This file is part of the Ginny package: https://github.com/mattcrowe/ginny
  *
@@ -21,71 +22,75 @@ use Foote\Ginny\Exception\GinnyMapException;
 class BaseBundle extends BaseItem
 {
 
-    /**
-     * @var BaseMap
-     */
-    public $map;
+  /**
+   * @var BaseMap
+   */
+  public $map;
 
-    /**
-     * @var Collection|BaseModel[]
-     */
-    public $models;
+  /**
+   * @var Collection|BaseModel[]
+   */
+  public $models;
 
-    function __construct($name, $params=[])
-    {
-        parent::__construct($name, $params);
+  function __construct($name, $params = [])
+  {
 
-        $this->models = new Collection();
+    parent::__construct($name, $params);
+
+    $this->models = new Collection();
+  }
+
+  public function addModel(BaseModel $model)
+  {
+    if (!$this->models->containsKey($model->name)) {
+
+      $model->bundle = $this;
+
+      $this->models->set($model->name, $model);
     }
 
-    public function addModel(BaseModel $model)
-    {
-        if (!$this->models->containsKey($model->name)) {
+    return $this;
+  }
 
-            $model->bundle = $this;
+  /**
+   * {@inheritdoc}
+   */
+  public function dump()
+  {
 
-            $this->models->set($model->name, $model);
-        }
+    $dump = [];
 
-        return $this;
+    foreach ($this->models as $model) {
+      $dump['Model:' . $model->name] = $model->dump();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function dump() {
+    return $dump;
+  }
 
-        $dump = [];
+  /**
+   * {@inheritdoc}
+   */
+  public function update()
+  {
 
-        foreach($this->models as $model) {
-            $dump['Model:' . $model->name] = $model->dump();
-        }
+    //self update
 
-        return $dump;
+    foreach ($this->models as $model) {
+      $model->update();
     }
+  }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function update() {
+  /**
+   * {@inheritdoc}
+   */
+  public function validate()
+  {
 
-        //self update
+    //self validate
 
-        foreach($this->models as $model) {
-            $model->update();
-        }
+    foreach ($this->models as $model) {
+      $model->validate();
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validate() {
-
-        //self validate
-
-        foreach($this->models as $model) {
-            $model->validate();
-        }
-    }
+  }
 
 }

@@ -1,4 +1,5 @@
 <?php namespace Foote\Ginny\Tests\Command;
+
 /**
  * This file is part of the Ginny package: https://github.com/mattcrowe/ginny
  *
@@ -20,262 +21,264 @@ use Symfony\Component\Console\Input\InputOption;
 class GinnyInputTest extends \PHPUnit_Framework_TestCase
 {
 
-    /**
-     * @covers \Foote\Ginny\Command\GinnyInput::getOptionsFromRequest
-     * @covers \Foote\Ginny\Command\GinnyInput::__construct
-     */
-    public function testgetOptionsFromRequest()
-    {
+  /**
+   * @covers \Foote\Ginny\Command\GinnyInput::getOptionsFromRequest
+   * @covers \Foote\Ginny\Command\GinnyInput::__construct
+   */
+  public function testgetOptionsFromRequest()
+  {
 
-        $request = Request::createFromGlobals();
+    $request = Request::createFromGlobals();
 
-        $argv = $request->server->get('argv');
+    $argv = $request->server->get('argv');
 
-        $request->server->set('argv', [
-            'ginny:generate', //GinnyInput shifts out application name
-            '--root=my/root/path/', //regular option
-            '--extra=none', //another regulation option
-            '-p', //option reference by shortcut
-            'Manage',
-            'test1',
-            'test2=result2',
-        ]);
+    $request->server->set('argv', [
+      'ginny:generate', //GinnyInput shifts out application name
+      '--root=my/root/path/', //regular option
+      '--extra=none', //another regulation option
+      '-p', //option reference by shortcut
+      'Manage',
+      'test1',
+      'test2=result2',
+    ]);
 
-        // ensures that $request->server in GinnyInput::get() loads the new argv
-        $request->overrideGlobals();
+    // ensures that $request->server in GinnyInput::get() loads the new argv
+    $request->overrideGlobals();
 
-        $passed = GinnyInput::getOptionsFromRequest();
+    $passed = GinnyInput::getOptionsFromRequest();
 
-        $this->assertTrue(array_key_exists('--root', $passed));
-        $this->assertTrue(array_key_exists('--extra', $passed));
-        $this->assertTrue(array_key_exists('-p', $passed));
+    $this->assertTrue(array_key_exists('--root', $passed));
+    $this->assertTrue(array_key_exists('--extra', $passed));
+    $this->assertTrue(array_key_exists('-p', $passed));
 
-        $this->assertEquals('my/root/path/', $passed['--root']);
-        $this->assertEquals('none', $passed['--extra']);
-        $this->assertEquals('Manage', $passed['-p']);
+    $this->assertEquals('my/root/path/', $passed['--root']);
+    $this->assertEquals('none', $passed['--extra']);
+    $this->assertEquals('Manage', $passed['-p']);
 
-        //test that the other stuff isn't pass on
-        $this->assertFalse(array_key_exists('test1', $passed));
-        $this->assertFalse(array_key_exists('--test1', $passed));
-        $this->assertFalse(array_key_exists('test2', $passed));
-        $this->assertFalse(array_key_exists('--test2', $passed));
+    //test that the other stuff isn't pass on
+    $this->assertFalse(array_key_exists('test1', $passed));
+    $this->assertFalse(array_key_exists('--test1', $passed));
+    $this->assertFalse(array_key_exists('test2', $passed));
+    $this->assertFalse(array_key_exists('--test2', $passed));
 
-        $yaml = new \Symfony\Component\Yaml\Parser();
-        $local_defaults = $yaml->parse(file_get_contents(__DIR__ . '/../../ginny.dist.yml'));
-        $local_defaults['root'] = __DIR__ . '/../../';
-
-        /**
-         * Ensure that GinnyInput::getOptionsFromRequest() is invoked when get()
-         * is called without $passed. -p=Manage above should override prefix=Admin
-         * found in $local_defaults
-         */
-
-        $input = new GinnyInput($local_defaults);
-        $this->assertEquals('Manage', $input->getParameterOption('--prefix'));
-
-        // restore $_SERVER['argv']
-        $request->server->set('argv', $argv);
-        $request->overrideGlobals();
-    }
+    $yaml = new \Symfony\Component\Yaml\Parser();
+    $local_defaults = $yaml->parse(file_get_contents(__DIR__ . '/../../ginny.dist.yml'));
+    $local_defaults['root'] = __DIR__ . '/../../';
 
     /**
-     * @covers \Foote\Ginny\Command\GinnyInput::__construct
+     * Ensure that GinnyInput::getOptionsFromRequest() is invoked when get()
+     * is called without $passed. -p=Manage above should override prefix=Admin
+     * found in $local_defaults
      */
-    public function testget()
-    {
 
-        $yaml = new \Symfony\Component\Yaml\Parser();
-        $local_defaults = $yaml->parse(file_get_contents(__DIR__ . '/../../ginny.dist.yml'));
-        $local_defaults['root'] = __DIR__ . '/../../';
+    $input = new GinnyInput($local_defaults);
+    $this->assertEquals('Manage', $input->getParameterOption('--prefix'));
 
-        $input = new GinnyInput($local_defaults, [
-            '--schema_filename' => 'test',
-            '-p' => 'Manage'
-        ]);
+    // restore $_SERVER['argv']
+    $request->server->set('argv', $argv);
+    $request->overrideGlobals();
+  }
 
-        // local default "root" intact
-        $this->assertEquals($local_defaults['root'], $input->getParameterOption('--root'));
+  /**
+   * @covers \Foote\Ginny\Command\GinnyInput::__construct
+   */
+  public function testget()
+  {
 
-        // local default "schema_filename" overridden
-        $this->assertEquals('test', $input->getParameterOption('--schema_filename'));
+    $yaml = new \Symfony\Component\Yaml\Parser();
+    $local_defaults = $yaml->parse(file_get_contents(__DIR__ . '/../../ginny.dist.yml'));
+    $local_defaults['root'] = __DIR__ . '/../../';
 
-        // local default "prefix" overridden via shortcut
-        $this->assertEquals('Manage', $input->getParameterOption('--prefix'));
-    }
+    $input = new GinnyInput($local_defaults, [
+      '--schema_filename' => 'test',
+      '-p' => 'Manage'
+    ]);
 
-    /**
-     * @covers \Foote\Ginny\Command\GinnyInput::getFullSchemaPath
-     */
-    public function testgetFullSchemaPath()
-    {
+    // local default "root" intact
+    $this->assertEquals($local_defaults['root'],
+      $input->getParameterOption('--root'));
 
-        $yaml = new \Symfony\Component\Yaml\Parser();
-        $local_defaults = $yaml->parse(file_get_contents(__DIR__ . '/../configs/default.yml'));
-        $local_defaults['root'] = __DIR__ . '/../../';
+    // local default "schema_filename" overridden
+    $this->assertEquals('test',
+      $input->getParameterOption('--schema_filename'));
 
-        $input = new GinnyInput($local_defaults, [
-            '-f' => 'my-test-file.xml'
-        ]);
+    // local default "prefix" overridden via shortcut
+    $this->assertEquals('Manage', $input->getParameterOption('--prefix'));
+  }
 
-        $input->bind(new GinnyDefinition());
+  /**
+   * @covers \Foote\Ginny\Command\GinnyInput::getFullSchemaPath
+   */
+  public function testgetFullSchemaPath()
+  {
 
-        $this->assertEquals(
-            $local_defaults['root'] . 'Tests/schemas/my-test-file.xml',
-            $input->getFullSchemaPath()
-        );
-    }
+    $yaml = new \Symfony\Component\Yaml\Parser();
+    $local_defaults = $yaml->parse(file_get_contents(__DIR__ . '/../configs/default.yml'));
+    $local_defaults['root'] = __DIR__ . '/../../';
 
-    /**
-     * @covers \Foote\Ginny\Command\GinnyInput::getFullTemplatePath
-     */
-    public function testgetFullTemplatePath()
-    {
+    $input = new GinnyInput($local_defaults, [
+      '-f' => 'my-test-file.xml'
+    ]);
 
-        $yaml = new \Symfony\Component\Yaml\Parser();
-        $local_defaults = $yaml->parse(file_get_contents(__DIR__ . '/../configs/default.yml'));
-        $local_defaults['root'] = __DIR__ . '/../../';
+    $input->bind(new GinnyDefinition());
 
-        $input = new GinnyInput($local_defaults, [
-            '-v' => 'test/template/path'
-        ]);
+    $this->assertEquals(
+      $local_defaults['root'] . 'Tests/schemas/my-test-file.xml',
+      $input->getFullSchemaPath()
+    );
+  }
 
-        $input->bind(new GinnyDefinition());
+  /**
+   * @covers \Foote\Ginny\Command\GinnyInput::getFullTemplatePath
+   */
+  public function testgetFullTemplatePath()
+  {
 
-        $this->assertEquals(
-            $local_defaults['root'] . 'test/template/path',
-            $input->getFullTemplatePath()
-        );
-    }
+    $yaml = new \Symfony\Component\Yaml\Parser();
+    $local_defaults = $yaml->parse(file_get_contents(__DIR__ . '/../configs/default.yml'));
+    $local_defaults['root'] = __DIR__ . '/../../';
 
-    /**
-     * @covers \Foote\Ginny\Command\GinnyInput::getFullTargetPath
-     */
-    public function testgetFullTargetPath()
-    {
+    $input = new GinnyInput($local_defaults, [
+      '-v' => 'test/template/path'
+    ]);
 
-        $yaml = new \Symfony\Component\Yaml\Parser();
-        $local_defaults = $yaml->parse(file_get_contents(__DIR__ . '/../configs/default.yml'));
-        $local_defaults['root'] = __DIR__ . '/../../';
+    $input->bind(new GinnyDefinition());
 
-        $input = new GinnyInput($local_defaults, [
-            '-t' => 'test/target/path/'
-        ]);
+    $this->assertEquals(
+      $local_defaults['root'] . 'test/template/path',
+      $input->getFullTemplatePath()
+    );
+  }
 
-        $input->bind(new GinnyDefinition());
+  /**
+   * @covers \Foote\Ginny\Command\GinnyInput::getFullTargetPath
+   */
+  public function testgetFullTargetPath()
+  {
 
-        $this->assertEquals(
-            $local_defaults['root'] . 'test/target/path/',
-            $input->getFullTargetPath()
-        );
-    }
+    $yaml = new \Symfony\Component\Yaml\Parser();
+    $local_defaults = $yaml->parse(file_get_contents(__DIR__ . '/../configs/default.yml'));
+    $local_defaults['root'] = __DIR__ . '/../../';
 
-    /**
-     * @covers \Foote\Ginny\Command\GinnyInput::validate
-     */
-    public function testvalidate()
-    {
+    $input = new GinnyInput($local_defaults, [
+      '-t' => 'test/target/path/'
+    ]);
 
-        $yaml = new \Symfony\Component\Yaml\Parser();
-        $local_defaults = $yaml->parse(file_get_contents(__DIR__ . '/../configs/default.yml'));
-        $local_defaults['root'] = __DIR__ . '/../../';
+    $input->bind(new GinnyDefinition());
 
-        $input = new GinnyInput($local_defaults);
+    $this->assertEquals(
+      $local_defaults['root'] . 'test/target/path/',
+      $input->getFullTargetPath()
+    );
+  }
 
-        $input->bind(new GinnyDefinition());
+  /**
+   * @covers \Foote\Ginny\Command\GinnyInput::validate
+   */
+  public function testvalidate()
+  {
 
-        $input->validate();
+    $yaml = new \Symfony\Component\Yaml\Parser();
+    $local_defaults = $yaml->parse(file_get_contents(__DIR__ . '/../configs/default.yml'));
+    $local_defaults['root'] = __DIR__ . '/../../';
 
-        // no exceptions thrown? our test config file is valid and we continue...
+    $input = new GinnyInput($local_defaults);
 
-        $this->assertTrue(true);
-    }
+    $input->bind(new GinnyDefinition());
 
-    /**
-     * @covers \Foote\Ginny\Command\GinnyInput::validate
-     *
-     * @expectedException \Foote\Ginny\Exception\GinnyInputException
-     * @expectedExceptionCode 100
-     */
-    public function testFullSchemaPathException()
-    {
+    $input->validate();
 
-        $yaml = new \Symfony\Component\Yaml\Parser();
-        $local_defaults = $yaml->parse(file_get_contents(__DIR__ . '/../configs/default.yml'));
-        $local_defaults['root'] = __DIR__ . '/../../';
+    // no exceptions thrown? our test config file is valid and we continue...
 
-        $input = new GinnyInput($local_defaults, [
-            '-f' => 'my-test-file.xml'
-        ]);
+    $this->assertTrue(true);
+  }
 
-        $input->bind(new GinnyDefinition());
+  /**
+   * @covers \Foote\Ginny\Command\GinnyInput::validate
+   *
+   * @expectedException \Foote\Ginny\Exception\GinnyInputException
+   * @expectedExceptionCode 100
+   */
+  public function testFullSchemaPathException()
+  {
 
-        $input->validate();
-    }
+    $yaml = new \Symfony\Component\Yaml\Parser();
+    $local_defaults = $yaml->parse(file_get_contents(__DIR__ . '/../configs/default.yml'));
+    $local_defaults['root'] = __DIR__ . '/../../';
 
-    /**
-     * @covers \Foote\Ginny\Command\GinnyInput::validate
-     *
-     * @expectedException \Foote\Ginny\Exception\GinnyInputException
-     * @expectedExceptionCode 101
-     */
-    public function testGetFullTemplatePathException()
-    {
+    $input = new GinnyInput($local_defaults, [
+      '-f' => 'my-test-file.xml'
+    ]);
 
-        $yaml = new \Symfony\Component\Yaml\Parser();
-        $local_defaults = $yaml->parse(file_get_contents(__DIR__ . '/../configs/default.yml'));
-        $local_defaults['root'] = __DIR__ . '/../../';
+    $input->bind(new GinnyDefinition());
 
-        $input = new GinnyInput($local_defaults, [
-            '-v' => 'bad-path'
-        ]);
+    $input->validate();
+  }
 
-        $input->bind(new GinnyDefinition());
+  /**
+   * @covers \Foote\Ginny\Command\GinnyInput::validate
+   *
+   * @expectedException \Foote\Ginny\Exception\GinnyInputException
+   * @expectedExceptionCode 101
+   */
+  public function testGetFullTemplatePathException()
+  {
 
-        $input->validate();
-    }
+    $yaml = new \Symfony\Component\Yaml\Parser();
+    $local_defaults = $yaml->parse(file_get_contents(__DIR__ . '/../configs/default.yml'));
+    $local_defaults['root'] = __DIR__ . '/../../';
 
-    /**
-     * @covers \Foote\Ginny\Command\GinnyInput::validate
-     *
-     * @expectedException \Foote\Ginny\Exception\GinnyInputException
-     * @expectedExceptionCode 102
-     */
-    public function testGetFullTargetPathException()
-    {
+    $input = new GinnyInput($local_defaults, [
+      '-v' => 'bad-path'
+    ]);
 
-        $yaml = new \Symfony\Component\Yaml\Parser();
-        $local_defaults = $yaml->parse(file_get_contents(__DIR__ . '/../configs/default.yml'));
-        $local_defaults['root'] = __DIR__ . '/../../';
+    $input->bind(new GinnyDefinition());
 
-        $input = new GinnyInput($local_defaults, [
-            '-t' => 'bad-path'
-        ]);
+    $input->validate();
+  }
 
-        $input->bind(new GinnyDefinition());
+  /**
+   * @covers \Foote\Ginny\Command\GinnyInput::validate
+   *
+   * @expectedException \Foote\Ginny\Exception\GinnyInputException
+   * @expectedExceptionCode 102
+   */
+  public function testGetFullTargetPathException()
+  {
 
-        $input->validate();
-    }
+    $yaml = new \Symfony\Component\Yaml\Parser();
+    $local_defaults = $yaml->parse(file_get_contents(__DIR__ . '/../configs/default.yml'));
+    $local_defaults['root'] = __DIR__ . '/../../';
 
-    /**
-     * @covers \Foote\Ginny\Command\GinnyInput::validate
-     *
-     * @expectedException \Foote\Ginny\Exception\GinnyInputException
-     * @expectedExceptionCode 103
-     */
-    public function testInvalidGeneratorNamespaceException()
-    {
+    $input = new GinnyInput($local_defaults, [
+      '-t' => 'bad-path'
+    ]);
 
-        $yaml = new \Symfony\Component\Yaml\Parser();
-        $local_defaults = $yaml->parse(file_get_contents(__DIR__ . '/../configs/default.yml'));
-        $local_defaults['root'] = __DIR__ . '/../../';
+    $input->bind(new GinnyDefinition());
 
-        $input = new GinnyInput($local_defaults, [
-            '-g' => 'InvalidGeneratorName'
-        ]);
+    $input->validate();
+  }
 
-        $input->bind(new GinnyDefinition());
+  /**
+   * @covers \Foote\Ginny\Command\GinnyInput::validate
+   *
+   * @expectedException \Foote\Ginny\Exception\GinnyInputException
+   * @expectedExceptionCode 103
+   */
+  public function testInvalidGeneratorNamespaceException()
+  {
 
-        $input->validate();
-    }
+    $yaml = new \Symfony\Component\Yaml\Parser();
+    $local_defaults = $yaml->parse(file_get_contents(__DIR__ . '/../configs/default.yml'));
+    $local_defaults['root'] = __DIR__ . '/../../';
+
+    $input = new GinnyInput($local_defaults, [
+      '-g' => 'InvalidGeneratorName'
+    ]);
+
+    $input->bind(new GinnyDefinition());
+
+    $input->validate();
+  }
 
 }

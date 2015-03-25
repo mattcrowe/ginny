@@ -1,4 +1,5 @@
 <?php namespace Foote\Ginny\Tests\Command;
+
 /**
  * This file is part of the Ginny package: https://github.com/mattcrowe/ginny
  *
@@ -22,34 +23,34 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 class GinnyCommandTest extends \PHPUnit_Framework_TestCase
 {
 
-    /**
-     * @covers \Foote\Ginny\Command\GinnyCommand::configure
-     */
-    public function testconfigure()
-    {
-        $cmd = new GinnyCommand();
+  /**
+   * @covers \Foote\Ginny\Command\GinnyCommand::configure
+   */
+  public function testconfigure()
+  {
+    $cmd = new GinnyCommand();
 
-        $this->assertEquals($cmd->getName(), 'ginny:generate');
-        $this->assertNotEmpty($cmd->getDescription());
-        $this->assertEquals($cmd->getDefinition(), new GinnyDefinition());
-    }
+    $this->assertEquals($cmd->getName(), 'ginny:generate');
+    $this->assertNotEmpty($cmd->getDescription());
+    $this->assertEquals($cmd->getDefinition(), new GinnyDefinition());
+  }
 
-    /**
-     * @covers \Foote\Ginny\Command\GinnyCommand::execute
-     */
-    public function testexecute()
-    {
+  /**
+   * @covers \Foote\Ginny\Command\GinnyCommand::execute
+   */
+  public function testexecute()
+  {
 
-        $yaml = new \Symfony\Component\Yaml\Parser();
-        $local_defaults = $yaml->parse(file_get_contents(__DIR__ . '/../configs/default.yml'));
-        $local_defaults['root'] = __DIR__ . '/../../';
+    $yaml = new \Symfony\Component\Yaml\Parser();
+    $local_defaults = $yaml->parse(file_get_contents(__DIR__ . '/../configs/default.yml'));
+    $local_defaults['root'] = __DIR__ . '/../../';
 
-        $input = new GinnyInput($local_defaults);
+    $input = new GinnyInput($local_defaults);
 
-        $cmd = new GinnyCommand();
+    $cmd = new GinnyCommand();
 
-        //nothing happens
-        $cmd->run($input, new ConsoleOutput(ConsoleOutput::VERBOSITY_QUIET));
-    }
+    //nothing happens
+    $cmd->run($input, new ConsoleOutput(ConsoleOutput::VERBOSITY_QUIET));
+  }
 
 }

@@ -1,4 +1,5 @@
 <?php namespace Foote\Ginny\Tests\Command;
+
 /**
  * This file is part of the Ginny package: https://github.com/mattcrowe/ginny
  *
@@ -16,58 +17,58 @@ use Foote\Ginny\Twig\InflectorExtension;
 class InflectorExtensionTest extends \PHPUnit_Framework_TestCase
 {
 
+  /**
+   * covers \Foote\Ginny\Twig\InflectorExtension::getName
+   * covers \Foote\Ginny\Twig\InflectorExtension::getFilters
+   */
+  public function testblade()
+  {
+
+    $extension = new InflectorExtension();
+
+    $this->assertEquals($extension->getName(), 'inflector_extension');
+
     /**
-     * covers \Foote\Ginny\Twig\InflectorExtension::getName
-     * covers \Foote\Ginny\Twig\InflectorExtension::getFilters
+     * @var $filter \Twig_SimpleFilter
      */
-    public function testblade()
-    {
+    foreach ($extension->getFilters() as $filter) {
 
-        $extension = new InflectorExtension();
+      $callable = $filter->getCallable();
 
-        $this->assertEquals($extension->getName(), 'inflector_extension');
+      if ($filter->getName() == 'low') {
+        $this->assertEquals($callable('ABC'), 'abc');
+      };
 
-        /**
-         * @var $filter \Twig_SimpleFilter
-         */
-        foreach($extension->getFilters() as $filter) {
+      if ($filter->getName() == 'up') {
+        $this->assertEquals($callable('abc'), 'ABC');
+      };
 
-            $callable = $filter->getCallable();
+      if ($filter->getName() == 'singularize') {
+        $this->assertEquals($callable('things'), 'thing');
+      };
 
-            if ($filter->getName() == 'low') {
-                $this->assertEquals($callable('ABC'), 'abc');
-            };
+      if ($filter->getName() == 'pluralize') {
+        $this->assertEquals($callable('thing'), 'things');
+        $this->assertEquals($callable('knife'), 'knives');
+        $this->assertEquals($callable('child'), 'children');
+      };
 
-            if ($filter->getName() == 'up') {
-                $this->assertEquals($callable('abc'), 'ABC');
-            };
+      if ($filter->getName() == 'camelize') {
+        $this->assertEquals($callable('one_big_thing'), 'OneBigThing');
+      };
 
-            if ($filter->getName() == 'singularize') {
-                $this->assertEquals($callable('things'), 'thing');
-            };
+      if ($filter->getName() == 'variableize') {
+        $this->assertEquals($callable('one_big_thing'), 'oneBigThing');
+      };
 
-            if ($filter->getName() == 'pluralize') {
-                $this->assertEquals($callable('thing'), 'things');
-                $this->assertEquals($callable('knife'), 'knives');
-                $this->assertEquals($callable('child'), 'children');
-            };
+      if ($filter->getName() == 'underscore') {
+        $this->assertEquals($callable('OneBigThing'), 'one_big_thing');
+      };
 
-            if ($filter->getName() == 'camelize') {
-                $this->assertEquals($callable('one_big_thing'), 'OneBigThing');
-            };
-
-            if ($filter->getName() == 'variableize') {
-                $this->assertEquals($callable('one_big_thing'), 'oneBigThing');
-            };
-
-            if ($filter->getName() == 'underscore') {
-                $this->assertEquals($callable('OneBigThing'), 'one_big_thing');
-            };
-
-            if ($filter->getName() == 'humanize') {
-                $this->assertEquals($callable('one_big_thing'), 'One big thing');
-            };
-        }
+      if ($filter->getName() == 'humanize') {
+        $this->assertEquals($callable('one_big_thing'), 'One big thing');
+      };
     }
+  }
 
 }

@@ -1,4 +1,5 @@
 <?php namespace Foote\Ginny\Tests\Command;
+
 /**
  * This file is part of the Ginny package: https://github.com/mattcrowe/ginny
  *
@@ -19,23 +20,23 @@ use Symfony\Component\Console\Input\InputOption;
 class GinnyDefinitionTest extends \PHPUnit_Framework_TestCase
 {
 
+  /**
+   * @covers \Foote\Ginny\Command\GinnyDefinition::__construct
+   */
+  public function test__construct()
+  {
+
+    $ginnyDefinition = new GinnyDefinition();
+
     /**
-     * @covers \Foote\Ginny\Command\GinnyDefinition::__construct
+     * There's not much to check here, but let's at least double check
+     * there are no arguments and some options.
      */
-    public function test__construct()
-    {
 
-        $ginnyDefinition = new GinnyDefinition();
-
-        /**
-         * There's not much to check here, but let's at least double check
-         * there are no arguments and some options.
-         */
-
-        $this->assertEquals(0, $ginnyDefinition->getArgumentCount());
-        $this->assertTrue($ginnyDefinition->hasOption('root'));
-        $this->assertTrue($ginnyDefinition->hasOption('model'));
-        $this->assertTrue($ginnyDefinition->hasOption('extra'));
-    }
+    $this->assertEquals(0, $ginnyDefinition->getArgumentCount());
+    $this->assertTrue($ginnyDefinition->hasOption('root'));
+    $this->assertTrue($ginnyDefinition->hasOption('model'));
+    $this->assertTrue($ginnyDefinition->hasOption('extra'));
+  }
 
 }

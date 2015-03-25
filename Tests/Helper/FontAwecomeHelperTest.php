@@ -1,4 +1,5 @@
 <?php namespace Foote\Ginny\Tests\Command;
+
 /**
  * This file is part of the Ginny package: https://github.com/mattcrowe/ginny
  *
@@ -16,33 +17,33 @@ use Foote\Ginny\Helper\FontAwesomeHelper;
 class FontAwesomeHelperTest extends \PHPUnit_Framework_TestCase
 {
 
-    /**
-     * @covers \Foote\Ginny\Helper\FontAwesomeHelper::icon
-     */
-    public function testblade()
-    {
+  /**
+   * @covers \Foote\Ginny\Helper\FontAwesomeHelper::icon
+   */
+  public function testblade()
+  {
 
-        $helper = new FontAwesomeHelper();
+    $helper = new FontAwesomeHelper();
 
-        $this->assertEquals(
-            $helper->icon('test'),
-            '<i class="fa fa-test"></i>'
-        );
+    $this->assertEquals(
+      $helper->icon('test'),
+      '<i class="fa fa-test"></i>'
+    );
 
-        $this->assertEquals(
-            $helper->icon('test', 'test'),
-            '<i class="fa fa-test">test</i>'
-        );
+    $this->assertEquals(
+      $helper->icon('test', 'test'),
+      '<i class="fa fa-test">test</i>'
+    );
 
-        $this->assertEquals(
-            $helper->icon('cancel'),
-            '<i class="fa fa-times"></i>'
-        );
+    $this->assertEquals(
+      $helper->icon('cancel'),
+      '<i class="fa fa-times"></i>'
+    );
 
-        $this->assertEquals(
-            $helper->icon('cancel', 'test'),
-            '<i class="fa fa-times">test</i>'
-        );
-    }
+    $this->assertEquals(
+      $helper->icon('cancel', 'test'),
+      '<i class="fa fa-times">test</i>'
+    );
+  }
 
 }
