@@ -7,10 +7,10 @@
 
 use BaseController;
 use Auth, DateTime, DB, Input, Redirect, Request, Response, Session, Validator, View;
-use {{ model.bundle }}\Model\{{ model }};
+use {{ model.bundle.namespace }}\Model\{{ model }};
 
 {% for relation in model.belongsTo %}
-use {{ relation.owner.bundle }}\Model\{{ relation }};
+use {{ relation.owner.bundle.namespace }}\Model\{{ relation }};
 {% endfor %}
 //nested
 

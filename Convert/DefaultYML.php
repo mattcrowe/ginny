@@ -29,8 +29,8 @@ class DefaultYML
 
     if (is_dir($path)) {
 
-      $file = file_get_contents($path . 'Bundle.yml');
-      $data = $parser->parse($file);
+      $data['name'] = $input->getOption('bundle');
+      $data['namespace'] = $input->getOption('namespace');
 
       $data['models'] = [];
       $data['associations'] = [];

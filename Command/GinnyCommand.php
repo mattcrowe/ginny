@@ -39,7 +39,7 @@ class GinnyCommand extends Command
    */
   protected function configure()
   {
-    $this->setName('ginny:generate');
+    $this->setName('foote:ginny');
     $this->setDescription('generate MVC bundle for your favorite framework');
     $this->setDefinition(new GinnyDefinition());
   }

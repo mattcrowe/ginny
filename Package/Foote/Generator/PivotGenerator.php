@@ -98,6 +98,7 @@ class PivotGenerator extends BaseGenerator
 
   public function genSchema()
   {
+
     foreach ($this->bundle->models as $model) {
 
       if (!$this->doModel($model->name)) {

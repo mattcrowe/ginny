@@ -5,26 +5,26 @@
  * https://github.com/mattcrowe/ginny
  */
 
-use {{ model.bundle }}\Model\{{ model }};
+use {{ model.bundle.namespace }}\Model\{{ model }};
 {% for relation in model.belongsTo %}
-use {{ relation.parent.bundle }}\Model\{{ relation.parent }};
+use {{ relation.parent.bundle.namespace }}\Model\{{ relation.parent }};
 {% endfor %}
 {% for relation in model.belongsToMany %}
-use {{ relation.parent.bundle }}\Model\{{ relation.parent }};
+use {{ relation.parent.bundle.namespace }}\Model\{{ relation.parent }};
 {% endfor %}
 {% for relation in model.hasOne %}
-use {{ relation.child.bundle }}\Model\{{ relation.child }};
+use {{ relation.child.bundle.namespace }}\Model\{{ relation.child }};
 {% endfor %}
 {% for relation in model.hasMany %}
-use {{ relation.child.bundle }}\Model\{{ relation.child }};
+use {{ relation.child.bundle.namespace }}\Model\{{ relation.child }};
 {% endfor %}
 
 class {{ model }}Test extends \TestCase
 {
 
     /**
-    * @covers {{ model.bundle }}\Model\{{ model }}::__toString
-    * @covers {{ model.bundle }}\Model\{{ model }}::getDates
+    * @covers {{ model.bundle.namespace }}\Model\{{ model }}::__toString
+    * @covers {{ model.bundle.namespace }}\Model\{{ model }}::getDates
     */
     public function testMisc()
     {
@@ -46,16 +46,16 @@ $this->assertTrue(in_array('updated_at', ${{ model.variable }}->getDates()));
     {% if model.associations.empty == false %}
         /**
         {% for relation in model.belongsTo %}
-            * @covers {{ model.bundle }}\Model\{{ model }}::{{ relation.parent.variable }}
+            * @covers {{ model.bundle.namespace }}\Model\{{ model }}::{{ relation.parent.variable }}
         {% endfor %}
         {% for relation in model.belongsToMany %}
-            * @covers {{ model.bundle }}\Model\{{ model }}::{{ relation.parent.variables }}
+            * @covers {{ model.bundle.namespace }}\Model\{{ model }}::{{ relation.parent.variables }}
         {% endfor %}
         {% for relation in model.hasOne %}
-            * @covers {{ model.bundle }}\Model\{{ model }}::{{ relation.child.variable }}
+            * @covers {{ model.bundle.namespace }}\Model\{{ model }}::{{ relation.child.variable }}
         {% endfor %}
         {% for relation in model.hasMany %}
-            * @covers {{ model.bundle }}\Model\{{ model }}::{{ relation.child.variables }}
+            * @covers {{ model.bundle.namespace }}\Model\{{ model }}::{{ relation.child.variables }}
         {% endfor %}
         */
         public function testRelations()

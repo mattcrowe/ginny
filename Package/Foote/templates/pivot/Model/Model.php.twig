@@ -5,8 +5,6 @@
  * https://github.com/mattcrowe/ginny
  */
 
-
-
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use DB, DateTime, Carbon;
@@ -33,28 +31,28 @@ class {{ model }} extends Model
 {% for relation in model.belongsTo %}
     public function {{ relation.variable }}()
     {
-    return $this->belongsTo('{{ relation.parent.bundle }}\Model\{{ relation.parent }}', '{{ relation.keys('local') }}', '{{ relation.keys('parent') }}');
+    return $this->belongsTo('{{ relation.parent.bundle.namespace }}\Model\{{ relation.parent }}', '{{ relation.keys('local') }}', '{{ relation.keys('parent') }}');
     }
 {% endfor %}
 
     {% for relation in model.belongsToMany %}
         public function {{ relation.variables }}()
         {
-        return $this->belongsToMany('{{ relation.parent.bundle }}\Model\{{ relation.parent }}', '{{ relation.pivot.table }}', '{{ relation.keys('pivot_local') }}', '{{ relation.keys('pivot_parent') }}');
+        return $this->belongsToMany('{{ relation.parent.bundle.namespace }}\Model\{{ relation.parent }}', '{{ relation.pivot.table }}', '{{ relation.keys('pivot_local') }}', '{{ relation.keys('pivot_parent') }}');
         }
     {% endfor %}
 
     {% for relation in model.hasOne %}
         public function {{ relation.variable }}()
         {
-        return $this->hasOne('{{ relation.child.bundle }}\Model\{{ relation.child }}', '{{ relation.keys('foreign') }}', '{{ relation.keys('local') }}');
+        return $this->hasOne('{{ relation.child.bundle.namespace }}\Model\{{ relation.child }}', '{{ relation.keys('foreign') }}', '{{ relation.keys('local') }}');
         }
     {% endfor %}
 
     {% for relation in model.hasMany %}
         public function {{ relation.variables }}()
         {
-        return $this->hasMany('{{ relation.child.bundle }}\Model\{{ relation.child }}', '{{ relation.keys('foreign') }}', '{{ relation.keys('local') }}');
+        return $this->hasMany('{{ relation.child.bundle.namespace }}\Model\{{ relation.child }}', '{{ relation.keys('foreign') }}', '{{ relation.keys('local') }}');
         }
     {% endfor %}
 

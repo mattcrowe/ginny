@@ -43,16 +43,16 @@ class {{ model.bundle }}{{ model }}Seeder extends Seeder {
 
         {% for relation in model.belongsTo %}
             $key{{ loop.index }} = '{{ relation.local_key }}';
-            $count{{ loop.index }} = ${{ relation.snakes }} = \{{ relation.parent.bundle }}\Model\{{ relation.parent }}::count();
+            $count{{ loop.index }} = ${{ relation.snakes }} = \{{ relation.parent.bundle.namespace }}\Model\{{ relation.parent }}::count();
         {% endfor %}
 
 $faker = \Faker\Factory::create();
 
-\{{ model.bundle }}\Model\{{ model }}::truncate();
+\{{ model.bundle.namespace }}\Model\{{ model }}::truncate();
 
 foreach (range(1, $count1) as $index1) {
 foreach (range(1, $count2) as $index2) {
-\{{ model.bundle }}\Model\{{ model }}::create([
+\{{ model.bundle.namespace }}\Model\{{ model }}::create([
 
 $key1 => $index1,
 $key2 => $index2,

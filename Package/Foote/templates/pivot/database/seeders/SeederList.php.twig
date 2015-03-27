@@ -22,7 +22,7 @@ class {{ bundle }}DatabaseSeeder extends Seeder {
 		Model::unguard();
 
         {% for model in bundle.models %}
-            {{ "$this->call('%s\\Seeder\\%s%sSeeder');" | format(bundle.name, bundle.name, model.name) }}
+            {{ "$this->call('%s\\Seeder\\%s%sSeeder');" | format(bundle.namespace, bundle.name, model.name) }}
         {% endfor %}
 
     }

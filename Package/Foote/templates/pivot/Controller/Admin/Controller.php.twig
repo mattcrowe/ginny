@@ -7,10 +7,10 @@
 
 use Illuminate\Routing\Controller;
 use Auth, DateTime, DB, Input, Redirect, Request, Response, Session, Validator, View;
-use {{ model.bundle }}\Model\{{ model }};
+use {{ bundle.namespace }}\Model\{{ model }};
 
 {% for relation in model.belongsTo %}
-use {{ relation.parent.bundle }}\Model\{{ relation }};
+use {{ relation.parent.bundle.namespace }}\Model\{{ relation }};
 {% endfor %}
 
 class {{ model.plural }}Controller extends Controller
