@@ -36,7 +36,20 @@ class DefaultYML
       $data['associations'] = [];
       $data['manyToManys'] = [];
 
-      $filenames = explode(',', $input->getOption('schema_filename'));
+      $schema_filename = $input->getOption('schema_filename');
+
+      if (empty($schema_filename)) {
+        $filenames = [];
+        $finder = new \Symfony\Component\Finder\Finder();
+        $finder->files()->in($input->getFullSchemaPath());
+        foreach($finder as $file) {
+          if ($file->getFilename() != 'ginny.yml') {
+            $filenames[] = str_replace('.yml', '', $file->getFilename());
+          }
+        }
+      } else {
+        $filenames = explode(',', $schema_filename);
+      }
 
       foreach ($filenames as $filename) {
 
