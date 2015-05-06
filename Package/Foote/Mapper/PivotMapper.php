@@ -27,6 +27,8 @@ class PivotMapper
 
       foreach ($bundle->models as $model) {
 
+        $model->table = $model->snakes;
+
         $model->url = '';
         $model->route = '';
 
@@ -41,9 +43,9 @@ class PivotMapper
           $model->snakes);
 
         $model->view .= sprintf('%s.%s.%s',
+          strtolower($map->prefix),
           $model->bundle->snake(),
-          $model->snakes(),
-          strtolower($map->prefix)
+          $model->snakes()
         );
 
       }

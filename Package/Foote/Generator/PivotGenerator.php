@@ -52,6 +52,7 @@ class PivotGenerator extends BaseGenerator
       'Model',
       'Controller/[Prefix]',
       'views',
+      'views/[prefix]',
       'database',
       'database/migrations',
       'Seeder',
@@ -62,6 +63,7 @@ class PivotGenerator extends BaseGenerator
     foreach ($folders as $folder) {
 
       $folder = str_replace('[Prefix]', $this->map->name, $folder);
+      $folder = str_replace('[prefix]', strtolower($this->map->name), $folder);
 
       $path = sprintf('%s%s/%s', $this->target, $this->bundle->name, $folder);
 
@@ -83,9 +85,9 @@ class PivotGenerator extends BaseGenerator
       $path = sprintf('%s%s/views/%s/%s/%s',
         $this->target,
         $model->bundle,
+        strtolower($this->map->prefix),
         $model->bundle->snake(),
-        $model->snakes(),
-        strtolower($this->map->prefix)
+        $model->snakes()
       );
 
       if (!@opendir($path)) {
@@ -237,9 +239,9 @@ class PivotGenerator extends BaseGenerator
       $target = sprintf('%s%s/views/%s/%s/%s',
         $this->target,
         $model->bundle,
+        strtolower($this->map->prefix),
         $model->bundle->snake(),
-        $model->snakes(),
-        strtolower($this->map->prefix)
+        $model->snakes()
       );
 
       $content_path = sprintf("views/%s/", strtolower($this->map->name));
@@ -253,7 +255,6 @@ class PivotGenerator extends BaseGenerator
         $this->save($target_filename, $content);
         $this->output->writeln('views added ' . $target_filename);
       }
-
 
       if ($this->doSubset('view-create') || $this->doSubset('views-all')) {
         $content = $this->render($content_path . 'create', [

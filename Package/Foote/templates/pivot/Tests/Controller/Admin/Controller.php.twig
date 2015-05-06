@@ -194,8 +194,8 @@ $this->refreshDatabase();
 
 public function refreshDatabase()
 {
-exec('rm ' . storage_path().'/database.sqlite');
-exec('cp ' . storage_path().'/stub.sqlite ' . storage_path().'/database.sqlite');
+$path = base_path() . '/database/testing/';
+exec('cp ' . $path . 'stub.sqlite ' . $path . 'database.sqlite');
 }
 
 }
