@@ -13,6 +13,7 @@
   ],
   "require": {
     "php": ">=5.4.0",
+    "doctrine/orm": "*",
     "doctrine/collections": "1.2.*@dev",
     "icanboogie/inflector": "*",
     "raveren/kint": "0.9.*@dev",
