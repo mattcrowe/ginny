@@ -101,6 +101,7 @@ class BaseAssociation extends BaseItem
         $this->addKey('local', $this->owner->fields->get($this->ownerKey));
         $this->addKey('foreign', $this->target->fields->get($this->targetKey));
         break;
+
     }
 
 

@@ -117,39 +117,10 @@ class BaseMapper
         foreach ($_bundle->associations as $_association) {
 
           # belongsTo (ex. User belongsTo Site)
+
           if ($model->name == $_association->from) {
 
-            if (strpos($_association->to, ':') != false) {
-              $bits = explode(':', $_association->to);
-              if (!$this->map->bundles->containsKey($bits[0])) {
-                //load the bundle...
-                $filename = str_replace($bundle->name, $bits[0],
-                  $this->input->getFullSchemaPath());
-                if (file_exists($filename)) {
-
-                  //TODO:decouple this
-                  $otherMap = new self($this->input);
-
-                  $xml = file_get_contents($filename);
-
-                  $schema = \Foote\Ginny\Convert\SkipperXML::convert($xml);
-                  $otherMap->schema = json_decode(json_encode($schema));
-
-                  $otherMap = $otherMap->map();
-                  if ($otherMap->bundles->containsKey($bits[0])) {
-                    $this->map->addBundle($otherMap->bundles->get($bits[0]));
-                  }
-                }
-              }
-              if ($this->map->bundles->containsKey($bits[0])) {
-                $otherBundle = $this->map->bundles->get($bits[0]);
-                if ($otherBundle->models->containsKey($bits[1])) {
-                  $parent = $otherBundle->models->get($bits[1]);
-                }
-              }
-            } else {
-              $parent = $bundle->models->get($_association->to);
-            }
+            $parent = $bundle->models->get($_association->to);
 
             new BaseAssociation($parent->name, [
               'owner' => $model, //User
@@ -160,7 +131,6 @@ class BaseMapper
             ]);
 
           }
-
 
           # hasOne and hasMany (ex. User hasOne Profile, User hasMany Comment)
 
@@ -186,7 +156,6 @@ class BaseMapper
         }
 
         # manyToMany
-
         foreach ($_bundle->manyToManys as $_manyToMany) {
 
           if ($model->name == $_manyToMany->name) {
@@ -244,12 +213,12 @@ class BaseMapper
 
           }
         }
+
       }
     }
 
     $this->map->update();
     $this->map->validate();
-
     //s($this->map->dump());
 
     return $this->map;

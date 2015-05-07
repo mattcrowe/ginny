@@ -44,7 +44,7 @@ class DefaultYML
         $finder->files()->in($input->getFullSchemaPath());
         foreach($finder as $file) {
           if ($file->getFilename() != 'ginny.yml') {
-            $filenames[] = str_replace('.yml', '', $file->getFilename());
+            $filenames[] = $file->getFilename();
           }
         }
       } else {
@@ -53,7 +53,7 @@ class DefaultYML
 
       foreach ($filenames as $filename) {
 
-        $file = $parser->parse(file_get_contents($path . $filename . '.yml'));
+        $file = $parser->parse(file_get_contents($path . $filename));
 
         if (!empty($file['model'])) {
 
@@ -83,13 +83,10 @@ class DefaultYML
         }
 
         if (!empty($file['associations'])) {
-          $data['associations'] = array_merge($data['associations'],
-            $file['associations']);
+          $data['associations'] = array_merge($data['associations'], $file['associations']);
         }
-
         if (!empty($file['manyToManys'])) {
-          $data['manyToManys'] = array_merge($data['manyToManys'],
-            $file['manyToManys']);
+          $data['manyToManys'] = array_merge($data['manyToManys'], $file['manyToManys']);
         }
 
       }
