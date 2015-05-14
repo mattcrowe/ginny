@@ -6,6 +6,7 @@
  */
 
 use DB, Session;
+use TN\Cms\Helper\TestingHelper;
 use {{ model.bundle.namespace }}\Model\{{ model }};
 use TN\Cms\Model\User;
 
@@ -21,7 +22,7 @@ class {{ model.plural }}ControllerTest extends \TestCase
     {
         parent::setUp();
         Session::start();
-        $this->refreshDatabase();
+        TestingHelper::refreshDB();
         $this->be(User::find(1)); //You are now authenticated
     }
 
@@ -112,8 +113,6 @@ $post['_token'] = Session::token();
 
 $this->call('PUT', '{{ model.url }}/1', $post);
 $this->assertRedirectedTo('{{ model.url }}/1');
-
-$this->refreshDatabase();
 }
 
 /**
@@ -155,8 +154,6 @@ $this->call('POST', '{{ model.url }}', $post);
 $next = DB::table('{{ model.table }}')->orderBy('id', 'desc')->first();
 
 $this->assertRedirectedTo('{{ model.url }}/' . $next->id);
-
-$this->refreshDatabase();
 }
 
 /**
@@ -188,14 +185,6 @@ $this->call('DELETE', '{{ model.url }}/1', ['_token' => Session::token()]);
 ${{ model.variable }} = {{ model }}::find(1);
 
 $this->assertEmpty(${{ model.variable }});
-
-$this->refreshDatabase();
-}
-
-public function refreshDatabase()
-{
-$path = base_path() . '/database/testing/';
-exec('cp ' . $path . 'stub.sqlite ' . $path . 'database.sqlite');
 }
 
 }

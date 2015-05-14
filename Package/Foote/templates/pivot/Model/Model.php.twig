@@ -7,8 +7,19 @@
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use DB, DateTime, Carbon;
+use DB, Carbon;
 
+/**
+ * \{{ model.bundle.namespace }}\Model\{{ model }}
+ *
+{% for field in model.fields %}
+ * @property {{ field.type }} ${{ field }}
+{% endfor %}
+ * @property \Carbon\Carbon $updated_at
+ * @property \Carbon\Carbon $deleted_at
+ * @method static {{ model }} find($value)
+ * @method static {{ model }} findOrFail($value)
+ */
 class {{ model }} extends Model
 {
 
@@ -22,7 +33,7 @@ class {{ model }} extends Model
         {% if field.name not in ['id'] %}
             {% if field.autoIncrement == false and field.required == true %}
                 '{{ field }}' => 'required',
-{% endif %}
+            {% endif %}
         {% endif %}
     {% endfor %}
 
