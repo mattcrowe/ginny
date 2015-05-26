@@ -24,7 +24,7 @@
         @foreach(${{ model.variables }} as ${{ model.variable }})
 
         <tr id="{{ '%s-index-{{ $%s->id }}'|format(model.variable, model.variable) }}">
-            <td><a class="btn" href="{{ model.url }}/{{ "{{ $%s->id }}" | format(model.variable) }}">Open</a></td>
+            <td><a href="{{ model.url }}/{{ "{{ $%s->id }}" | format(model.variable) }}">{{ "{{ $%s }}" | format(model.variable) }}</a></td>
             {% for field in model.fields %}
                 {% if field.sensitive == false %}
                     {% filter inline %}
