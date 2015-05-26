@@ -18,9 +18,14 @@ use DB, Carbon;
 class {{ model }} extends Model
 {
 
+    /**
+     * @var string database table used by the model
+     */
     protected $table = '{{ model.table }}';
 
-    # datetime attributes that are loaded as Carbon objects
+    /**
+     * @var array attributes to be mutated to \Carbon\Carbon datetime objects
+     */
     protected $dates = [
         {% filter inline %}
             {% for field in model.fieldsByType('datetime') %}
@@ -29,10 +34,14 @@ class {{ model }} extends Model
         {% endfilter %}
     ];
 
-    # attributes that cannot be override by Model::update($attributes)
+    /**
+     * @var array attributes that aren't mass assignable
+     */
     protected $guarded = ['id'];
 
-    # validation rules
+    /**
+     * @var array validation rules to be applied to the data
+     */
     public static $rules = [
 
     {% for field in model.fields %}
@@ -73,6 +82,11 @@ class {{ model }} extends Model
         }
     {% endfor %}
 
+/**
+* Convert the model to its string representation.
+*
+* @return string
+*/
 public function __toString() {
 return $this->{{ model.titleField }};
 }
